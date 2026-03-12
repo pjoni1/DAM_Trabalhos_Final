@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MultiLineApp</string>
+    <string name="helloworldoptional">helloworldOptional</string>
+</resources>
