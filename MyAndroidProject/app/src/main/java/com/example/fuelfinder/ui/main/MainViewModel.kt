@@ -3,7 +3,7 @@ package com.example.fuelfinder.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.fuelfinder.data.model.Station
+import com.example.fuelfinder.data.model.FuelStation
 import com.example.fuelfinder.data.repository.FuelRepository
 import com.example.fuelfinder.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: FuelRepository) : ViewModel() {
 
-    private val _stations = MutableStateFlow<Resource<List<Station>>>(Resource.Loading)
-    val stations: StateFlow<Resource<List<Station>>> = _stations.asStateFlow()
+    private val _stations = MutableStateFlow<Resource<List<FuelStation>>>(Resource.Loading)
+    val stations: StateFlow<Resource<List<FuelStation>>> = _stations.asStateFlow()
 
     private val _selectedFuelType = MutableStateFlow(FuelType.GASOLINE)
     val selectedFuelType: StateFlow<FuelType> = _selectedFuelType.asStateFlow()

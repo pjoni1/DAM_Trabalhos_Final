@@ -9,58 +9,37 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 class MockFuelApiInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        val city = request.url.queryParameter("city") ?: "Lisbon"
+        val localidade = request.url.queryParameter("localidade") ?: "Lisboa"
 
-        val jsonResponse = """
-            {
-              "stations": [
+        val jsonResponse = when(localidade.lowercase()) {
+            "lisboa" -> """
                 {
-                  "id": "1",
-                  "name": "Galp",
-                  "address": "Av. da Liberdade 100",
-                  "city": "$city",
-                  "latitude": 38.7202,
-                  "longitude": -9.1456,
-                  "gasolinePrice": 1.729,
-                  "dieselPrice": 1.639,
-                  "lastUpdated": "2023-10-27T10:00:00Z"
-                },
-                {
-                  "id": "2",
-                  "name": "Repsol",
-                  "address": "Rua Augusta 200",
-                  "city": "$city",
-                  "latitude": 38.7121,
-                  "longitude": -9.1370,
-                  "gasolinePrice": 1.689,
-                  "dieselPrice": 1.589,
-                  "lastUpdated": "2023-10-27T09:30:00Z"
-                },
-                {
-                  "id": "3",
-                  "name": "BP",
-                  "address": "Marquês de Pombal",
-                  "city": "$city",
-                  "latitude": 38.7253,
-                  "longitude": -9.1500,
-                  "gasolinePrice": 1.739,
-                  "dieselPrice": 1.669,
-                  "lastUpdated": "2023-10-27T08:15:00Z"
-                },
-                {
-                  "id": "4",
-                  "name": "Prio",
-                  "address": "Avenida Almirante Reis 50",
-                  "city": "$city",
-                  "latitude": 38.7258,
-                  "longitude": -9.1345,
-                  "gasolinePrice": 1.659,
-                  "dieselPrice": 1.549,
-                  "lastUpdated": "2023-10-27T11:45:00Z"
+                  "resultado": [
+                    { "Id": "1", "Nome": "Galp", "Marca": "Galp", "Localidade": "Lisboa", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.729" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.639" } ] },
+                    { "Id": "2", "Nome": "Repsol", "Marca": "Repsol", "Localidade": "Lisboa", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.689" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.589" } ] },
+                    { "Id": "3", "Nome": "BP", "Marca": "BP", "Localidade": "Lisboa", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.739" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.669" } ] },
+                    { "Id": "4", "Nome": "Prio", "Marca": "Prio", "Localidade": "Lisboa", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.659" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.549" } ] }
+                  ]
                 }
-              ]
-            }
-        """.trimIndent()
+            """.trimIndent()
+            "porto" -> """
+                {
+                  "resultado": [
+                    { "Id": "5", "Nome": "Cepsa", "Marca": "Cepsa", "Localidade": "Porto", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.699" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.559" } ] },
+                    { "Id": "6", "Nome": "Auchan", "Marca": "Auchan", "Localidade": "Porto", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.619" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.499" } ] },
+                    { "Id": "7", "Nome": "Galp", "Marca": "Galp", "Localidade": "Porto", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.719" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.629" } ] }
+                  ]
+                }
+            """.trimIndent()
+            else -> """
+                {
+                  "resultado": [
+                    { "Id": "8", "Nome": "Intermarché", "Marca": "Intermarché", "Localidade": "$localidade", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.609" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.489" } ] },
+                    { "Id": "9", "Nome": "BP", "Marca": "BP", "Localidade": "$localidade", "Combustiveis": [ { "TipoCombustivel": "Gasolina 95", "Preço": "1.759" }, { "TipoCombustivel": "Gasóleo Simples", "Preço": "1.679" } ] }
+                  ]
+                }
+            """.trimIndent()
+        }
 
         return Response.Builder()
             .code(200)

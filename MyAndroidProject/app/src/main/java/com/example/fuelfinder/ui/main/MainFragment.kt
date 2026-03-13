@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.fuelfinder.R
 import com.example.fuelfinder.data.api.RetrofitClient
+import com.example.fuelfinder.data.model.FuelStation
 import com.example.fuelfinder.data.repository.FuelRepository
 import com.example.fuelfinder.databinding.FragmentMainBinding
 import com.example.fuelfinder.utils.Resource
@@ -40,9 +42,21 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupCitySelector()
         setupRecyclerView()
         setupListeners()
         observeViewModel()
+    }
+
+    private fun setupCitySelector() {
+        val cities = listOf("Lisboa", "Porto", "Coimbra", "Braga", "Faro")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, cities)
+        binding.autoCompleteCity.setAdapter(adapter)
+
+        binding.autoCompleteCity.setOnItemClickListener { parent, _, position, _ ->
+            val selectedCity = parent.getItemAtPosition(position) as String
+            viewModel.fetchStations(selectedCity)
+        }
     }
 
     private fun setupRecyclerView() {

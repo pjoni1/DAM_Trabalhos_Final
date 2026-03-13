@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.fuelfinder.R
 import com.example.fuelfinder.data.api.RetrofitClient
+import com.example.fuelfinder.data.model.FuelStation
 import com.example.fuelfinder.data.repository.FuelRepository
 import com.example.fuelfinder.databinding.FragmentDetailsBinding
 import com.example.fuelfinder.utils.Resource
@@ -52,7 +53,7 @@ class DetailsFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.stationState.collect { resource ->
+                viewModel.stationState.collect { resource: Resource<FuelStation> ->
                     when (resource) {
                         is Resource.Loading -> {
                             binding.progressBar.visibility = View.VISIBLE
@@ -65,15 +66,18 @@ class DetailsFragment : Fragment() {
                             binding.tvError.visibility = View.GONE
 
                             val station = resource.data
-                            binding.tvStationName.text = station.name
-                            binding.tvStationAddress.text = "${station.address}, ${station.city}"
+                            binding.tvStationName.text = station.nome
+                            binding.tvStationAddress.text = "${station.marca}, ${station.localidade}"
 
-                            val gasPriceStr = station.gasolinePrice?.let { getString(R.string.price_format, it) } ?: getString(R.string.unknown_price)
-                            val dieselPriceStr = station.dieselPrice?.let { getString(R.string.price_format, it) } ?: getString(R.string.unknown_price)
+                            val gasPriceItem = station.combustiveis.find { it.tipoCombustivel.contains("Gasolina 95", ignoreCase = true) }
+                            val dieselPriceItem = station.combustiveis.find { it.tipoCombustivel.contains("Gasóleo Simples", ignoreCase = true) }
+
+                            val gasPriceStr = gasPriceItem?.preco?.let { "€$it/L" } ?: getString(R.string.unknown_price)
+                            val dieselPriceStr = dieselPriceItem?.preco?.let { "€$it/L" } ?: getString(R.string.unknown_price)
 
                             binding.tvGasolinePrice.text = gasPriceStr
                             binding.tvDieselPrice.text = dieselPriceStr
-                            binding.tvLastUpdated.text = getString(R.string.last_updated, station.lastUpdated)
+                            binding.tvLastUpdated.text = getString(R.string.last_updated, "N/A (API doesn't provide)")
                         }
                         is Resource.Error -> {
                             binding.progressBar.visibility = View.GONE

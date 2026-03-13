@@ -4,12 +4,14 @@ drawable ic_arrow_back
 drawable ic_launcher
 id action_mainFragment_to_detailsFragment
 id appBarLayout
+id autoCompleteCity
 id btnDiesel
 id btnGasoline
 id cardPrices
 id contentGroup
 id detailsFragment
 id mainFragment
+id menuCity
 id nav_graph
 id nav_host_fragment
 id progressBar

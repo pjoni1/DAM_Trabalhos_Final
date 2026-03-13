@@ -5,18 +5,18 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fuelfinder.R
-import com.example.fuelfinder.data.model.Station
+import com.example.fuelfinder.data.model.FuelStation
 import com.example.fuelfinder.databinding.ItemStationBinding
 
 class StationAdapter(
-    private val onClick: (Station) -> Unit
+    private val onClick: (FuelStation) -> Unit
 ) : RecyclerView.Adapter<StationAdapter.StationViewHolder>() {
 
-    private var stations: List<Station> = emptyList()
+    private var stations: List<FuelStation> = emptyList()
     private var currentFuelType: FuelType = FuelType.GASOLINE
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitList(list: List<Station>, fuelType: FuelType) {
+    fun submitList(list: List<FuelStation>, fuelType: FuelType) {
         stations = list
         currentFuelType = fuelType
         notifyDataSetChanged()
@@ -36,18 +36,21 @@ class StationAdapter(
     class StationViewHolder(private val binding: ItemStationBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(station: Station, fuelType: FuelType, onClick: (Station) -> Unit) {
-            binding.tvStationName.text = station.name
-            binding.tvStationAddress.text = "${station.address}, ${station.city}"
+        fun bind(station: FuelStation, fuelType: FuelType, onClick: (FuelStation) -> Unit) {
+            binding.tvStationName.text = station.nome
+            binding.tvStationAddress.text = "${station.marca}, ${station.localidade}"
 
-            val price = if (fuelType == FuelType.GASOLINE) {
-                station.gasolinePrice
+            val targetType = if (fuelType == FuelType.GASOLINE) {
+                "Gasolina 95"
             } else {
-                station.dieselPrice
+                "Gasóleo Simples"
             }
 
+            val priceItem = station.combustiveis.find { it.tipoCombustivel.contains(targetType, ignoreCase = true) }
+            val price = priceItem?.preco
+
             if (price != null) {
-                binding.tvPrice.text = binding.root.context.getString(R.string.price_format, price)
+                binding.tvPrice.text = "€$price/L" // DGEG returns price as string, e.g., "1.729"
             } else {
                 binding.tvPrice.text = binding.root.context.getString(R.string.unknown_price)
             }

@@ -3209,6 +3209,7 @@ int id asConfigured 0x7f080054
 int id async 0x7f080055
 int id auto 0x7f080056
 int id autoComplete 0x7f080057
+int id autoCompleteCity 0x7f080210
 int id autoCompleteToEnd 0x7f080058
 int id autoCompleteToStart 0x7f080059
 int id barrier 0x7f08005a
@@ -3399,6 +3400,7 @@ int id material_timepicker_ok_button 0x7f080112
 int id material_timepicker_view 0x7f080113
 int id material_value_index 0x7f080114
 int id matrix 0x7f080115
+int id menuCity 0x7f080211
 int id message 0x7f080116
 int id middle 0x7f080117
 int id mini 0x7f080118

@@ -4,6 +4,7 @@ package com.example.fuelfinder.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import androidx.viewbinding.ViewBindings;
 import com.example.fuelfinder.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.textfield.TextInputLayout;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -24,10 +26,16 @@ public final class FragmentMainBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
+  public final AutoCompleteTextView autoCompleteCity;
+
+  @NonNull
   public final MaterialButton btnDiesel;
 
   @NonNull
   public final MaterialButton btnGasoline;
+
+  @NonNull
+  public final TextInputLayout menuCity;
 
   @NonNull
   public final ProgressBar progressBar;
@@ -44,13 +52,17 @@ public final class FragmentMainBinding implements ViewBinding {
   @NonNull
   public final TextView tvTitle;
 
-  private FragmentMainBinding(@NonNull ConstraintLayout rootView, @NonNull MaterialButton btnDiesel,
-      @NonNull MaterialButton btnGasoline, @NonNull ProgressBar progressBar,
-      @NonNull RecyclerView rvStations, @NonNull MaterialButtonToggleGroup toggleGroupFuelType,
-      @NonNull TextView tvError, @NonNull TextView tvTitle) {
+  private FragmentMainBinding(@NonNull ConstraintLayout rootView,
+      @NonNull AutoCompleteTextView autoCompleteCity, @NonNull MaterialButton btnDiesel,
+      @NonNull MaterialButton btnGasoline, @NonNull TextInputLayout menuCity,
+      @NonNull ProgressBar progressBar, @NonNull RecyclerView rvStations,
+      @NonNull MaterialButtonToggleGroup toggleGroupFuelType, @NonNull TextView tvError,
+      @NonNull TextView tvTitle) {
     this.rootView = rootView;
+    this.autoCompleteCity = autoCompleteCity;
     this.btnDiesel = btnDiesel;
     this.btnGasoline = btnGasoline;
+    this.menuCity = menuCity;
     this.progressBar = progressBar;
     this.rvStations = rvStations;
     this.toggleGroupFuelType = toggleGroupFuelType;
@@ -85,6 +97,12 @@ public final class FragmentMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.autoCompleteCity;
+      AutoCompleteTextView autoCompleteCity = ViewBindings.findChildViewById(rootView, id);
+      if (autoCompleteCity == null) {
+        break missingId;
+      }
+
       id = R.id.btnDiesel;
       MaterialButton btnDiesel = ViewBindings.findChildViewById(rootView, id);
       if (btnDiesel == null) {
@@ -94,6 +112,12 @@ public final class FragmentMainBinding implements ViewBinding {
       id = R.id.btnGasoline;
       MaterialButton btnGasoline = ViewBindings.findChildViewById(rootView, id);
       if (btnGasoline == null) {
+        break missingId;
+      }
+
+      id = R.id.menuCity;
+      TextInputLayout menuCity = ViewBindings.findChildViewById(rootView, id);
+      if (menuCity == null) {
         break missingId;
       }
 
@@ -127,8 +151,8 @@ public final class FragmentMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentMainBinding((ConstraintLayout) rootView, btnDiesel, btnGasoline,
-          progressBar, rvStations, toggleGroupFuelType, tvError, tvTitle);
+      return new FragmentMainBinding((ConstraintLayout) rootView, autoCompleteCity, btnDiesel,
+          btnGasoline, menuCity, progressBar, rvStations, toggleGroupFuelType, tvError, tvTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
