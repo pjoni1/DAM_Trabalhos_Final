@@ -11,54 +11,59 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="92dp"
         android:text="@string/hello_string"
         android:textColor="#6200EC"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:layout_width="412dp"
-        android:layout_height="66dp"
-        android:background="#6200ED"
-        android:gravity="center_vertical"
-        android:paddingStart="16dp"
-        android:text="@string/app_name"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.165"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="409dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="108dp"
+        android:layout_width="380dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="132dp"
         android:background="#FDC101"
         android:text="@string/my_first"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="732dp"
+        android:layout_height="69dp"
+        android:background="#6200ED"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="174dp"
+        android:layout_height="192dp"
         android:layout_marginStart="94dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="23dp"
         android:layout_marginEnd="92dp"
-        android:layout_marginBottom="306dp"
+        android:layout_marginBottom="28dp"
         android:contentDescription="Just smile"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.043"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         app:srcCompat="@drawable/emoji" />
@@ -68,14 +73,14 @@
         style="@android:style/Widget.DeviceDefault.Light.CalendarView"
         android:layout_width="312dp"
         android:layout_height="268dp"
-        android:layout_marginStart="67dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="67dp"
-        android:layout_marginBottom="39dp"
+        android:layout_marginStart="380dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginEnd="39dp"
+        android:layout_marginBottom="41dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
