@@ -1,8 +1,8 @@
 # Assignment X —Title
 <!-- Replace X and Title -->
-Course: ___________________
-Student(s): _______________
-Date: _____________________
+Course: DAM
+Student: João Rosa
+Date: 03/26
 Repository URL: ___________
 ---
 ## 1. Introduction
