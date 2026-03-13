@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fuel Finder</string>
+    <string name="diesel">Diesel</string>
+    <string name="gasoline">Gasoline</string>
+    <string name="last_updated">Last updated: %s</string>
+    <string name="price_format">€%.3f/L</string>
+    <string name="unknown_price">N/A</string>
+    <style name="Theme.FuelFinder" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        <item name="colorPrimary">#006495</item>
+        <item name="colorSecondary">#4F6071</item>
+        <item name="colorTertiary">#64597B</item>
+    </style>
+</resources>

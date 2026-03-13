@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fuel Finder</string>
+    <string name="gasoline">Gasoline</string>
+    <string name="diesel">Diesel</string>
+    <string name="price_format">€%.3f/L</string>
+    <string name="unknown_price">N/A</string>
+    <string name="last_updated">Last updated: %s</string>
+</resources>

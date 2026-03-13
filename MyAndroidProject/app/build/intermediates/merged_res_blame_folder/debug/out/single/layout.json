@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.example.fuelfinder.app-mergeDebugResources-48:/layout/fragment_details.xml",
+        "source": "com.example.fuelfinder.app-main-51:/layout/fragment_details.xml"
+    },
+    {
+        "merged": "com.example.fuelfinder.app-mergeDebugResources-48:/layout/activity_main.xml",
+        "source": "com.example.fuelfinder.app-main-51:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.fuelfinder.app-mergeDebugResources-48:/layout/fragment_main.xml",
+        "source": "com.example.fuelfinder.app-main-51:/layout/fragment_main.xml"
+    },
+    {
+        "merged": "com.example.fuelfinder.app-mergeDebugResources-48:/layout/item_station.xml",
+        "source": "com.example.fuelfinder.app-main-51:/layout/item_station.xml"
+    }
+]
