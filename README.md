@@ -6,17 +6,24 @@ Date: 03/26
 Repository URL: https://github.com/pjoni1/DAM_Trabalhos_Final/tree/master
 ---
 ## 1. Introduction
-<!-- Purpose of the assignment, problem description, and objectives. -->
+This assignment served as an introduction to the Android development ecosystem and the Kotlin programming language. The main objectives were to configure the development environment (IntelliJ IDEA and Android Studio), understand basic Kotlin syntax, and create a functional application featuring adaptive layouts and customized graphical resources.
+
 ## 2. System Overview
 <!-- High-level description of the solution, main features, and use cases. -->
+
 ## 3. Architecture and Design
-<!-- Architecture, folder structure, design patterns, and justification of key
-decisions. -->
+The solution follows the standard Android architectural components:
+  -Logic Layer: Kotlin files implementing OOP principles (Classes and Objects).
+  -Presentation Layer: XML-based layouts using ConstraintLayout for a responsive UI.
+  -Resource Organization: Separation of concerns using res/values for strings/colors and res/layout for UI structure, including specific qualifiers for landscape mode
+  
 ## 4. Implementation
 <!-- Implementation details: main modules, components, algorithms, and relevant code
 excerpts. -->
+
 ## 5. Testing and Validation
 <!-- Testing strategy, test cases, scenarios, edge cases, and known limitations. -->
+
 ## 6. Usage Instructions
 <!-- How to run the project: requirements, setup, configuration, and execution steps.
 -->
@@ -31,17 +38,19 @@ debugging, testing, documentation, etc. -->
 ## 9. Verification of AI-Generated Artifacts
 <!-- Describe how you verified correctness of AI-generated code/designs (testing,
 manual review, static analysis, etc.). -->
+
 ## 10. Human vs AI Contribution
-<!-- Clearly state which parts were primarily human-developed and which were
-AI-assisted. -->
+Human: Performed the installation, wrote the core Kotlin exercises, designed the UI manually in the editor, and conducted all emulator tests.
+AI: Provided conceptual explanations and helped resolve environment-specific configuration errors.
+
 ## 11. Ethical and Responsible Use
 <!-- Reflect on risks, limitations, biases, or inappropriate outputs from AI tools
 and how they were handled. -->
 ---
 # Development Process
 ## 12. Version Control and Commit History
-<!-- Describe how version control was used. The commit history must reflect
-continuous work (not only final commits). -->
+Git was used to track progress. The history shows a clear evolution: initial environment setup, Kotlin logic implementation, Android UI design, and finally, resource optimization
+
 ## 13. Difficulties and Lessons Learned
 <!-- Main challenges, mistakes, insights, and skills acquired during the assignment.
 -->
