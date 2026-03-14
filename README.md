@@ -16,12 +16,18 @@ The solution is divided into three main developmental stages, showcasing a progr
   -Android Studio Foundational Tasks: Initial implementation of Android components within the Android Studio IDE. These exercises focused on understanding the Activity lifecycle, Project Structure (Manifests, Java/Kotlin sources, and Resources), and basic View interaction.
 
   -Anti-Gravity Fuel Application: The final project component consisting of a gas price monitor. It features a custom "Anti-Gravity" theme and implements a responsive UI that adapts to different screen orientations (Portrait and Landscape) using specific resource qualifiers and ConstraintLayout.
+  
 ---
 ## 3. Architecture and Design
+
 The solution follows the standard Android architectural components:
+
   -Logic Layer: Kotlin files implementing OOP principles (Classes and Objects).
+  
   -Presentation Layer: XML-based layouts using ConstraintLayout for a responsive UI.
+  
   -Resource Organization: Separation of concerns using res/values for strings/colors and res/layout for UI structure, including specific qualifiers for landscape mode
+  
 ---
 ## 4. Implementation
 The implementation was divided into three distinct modules, focusing on core programming logic and mobile interface design.
@@ -40,6 +46,7 @@ The implementation was divided into three distinct modules, focusing on core pro
   -Adaptability: Created specialized resource qualifiers (e.g., layout-land) to provide a custom experience when the device is rotated, ensuring no overlapping of graphical elements.
 
   -Resource Management: All text labels and color schemes were offloaded to strings.xml and colors.xml to follow Android best practices for maintainability
+  
 ---
 ## 5. Testing and Validation
 Functional Testing: The calculator was tested with edge cases such as division by zero and extremely large integers to verify bitwise shift behavior.
@@ -49,6 +56,7 @@ Input Stress Test: Intentionally entered non-numeric characters into the console
 Layout Validation: Used the Android Studio Emulator to verify the "Anti-Gravity" theme across different screen densities. Confirmed that the landscape orientation correctly displays all city data without clipping.
 
 Git Integrity: Verified the commit history through the terminal to ensure all incremental changes were correctly tracked after the initial repository mapping fix.
+
 ---
 ## 6. Usage Instructions
 Environment Setup: Ensure IntelliJ IDEA and Android Studio are installed.
@@ -58,6 +66,7 @@ Kotlin Exercises: Navigate to the dam package. Right-click on the desired exerci
 Android Application: Open the AntiGravityFuel project in Android Studio. Wait for the Gradle sync to complete and click the "Run" button (Shift + F10) to deploy to an emulator or physical device.
 
 Requirements: Android API level 30 or higher is recommended for the best experience.
+
 ---
 # Autonomous Software Engineering Sections - only for [AC OK, AI OK] sections
 ## 7. Prompting Strategy
@@ -70,6 +79,7 @@ The prompting strategy followed a dual-path approach, utilizing both reactive, u
   Structured Agentic Prompting (Anti-Gravity Framework): For the development of the final mobile application, a sophisticated prompting technique was used to define the AI as an autonomous software engineering agent. This prompt provided high-level context, specific goals, and strict constraints before any execution began.  
 
   Strategy Evolution: The strategy evolved from using AI as a simple "search engine" for fixing Git and IDE errors to utilizing it as a high-level architectural consultant. By providing a detailed "Master Prompt" in the Anti-Gravity environment, the interaction shifted from simple code-snippet requests to a professional "Plan-Review-Execute" workflow.
+  
 ---
 ## 8. Autonomous Agent Workflow
 The AI acted strictly as a Technical Assistant and Troubleshooting Consultant, not as a coder for the logic exercises. The workflow was as follows:
@@ -79,6 +89,7 @@ The AI acted strictly as a Technical Assistant and Troubleshooting Consultant, n
   -UI/UX Design Consultation: Providing conceptual guidance on how to organize the "Anti-Gravity" theme and ensuring the responsiveness of the fuel price display.
 
   -Documentation & Formatting: Assisting in the translation and professional structuring of this report to ensure technical accuracy in the final delivery.
+  
 ---
 ## 9. Verification of AI-Generated Artifacts
 Verification was focused on environment fixes and UI suggestions:
@@ -88,6 +99,7 @@ Verification was focused on environment fixes and UI suggestions:
   -Manual UI Review: Suggestions regarding layout orientation were manually implemented and adjusted in the Android Studio Layout Editor to match the specific "Anti-Gravity" visual requirements.
 
   -Fact-Checking: Any technical explanation provided by the AI for the report was cross-referenced with official Android and Kotlin documentation.
+  
 ---
 ## 10. Human vs AI Contribution
 Human: Performed the installation, wrote the core Kotlin exercises, designed the UI manually in the editor, and conducted all emulator tests.
@@ -101,6 +113,7 @@ Handling Limitations: AI suggestions regarding Git repository fixes were careful
 Bias and Accuracy: I recognized that AI can provide outdated or overly complex UI patterns. Consequently, every suggestion regarding the "Anti-Gravity" app's design was manually filtered and adjusted to match the specific requirements of the assignment's rubric and standard Android best practices.
 
 Transparency: This report serves as a full disclosure of AI involvement, clearly separating autonomous technical troubleshooting from the student’s original software development work.
+
 ---
 # Development Process
 ## 12. Version Control and Commit History
@@ -112,6 +125,7 @@ Git Root Mapping: The main technical hurdle was the IntelliJ VCS synchronization
 ConstraintLayout Chains: Aligning multiple elements symmetrically in the Anti-Gravity app required learning how to use chains and guidelines effectively to avoid overlapping components during screen rotation.
 
 Android Lifecycle: Understanding how resources are loaded based on qualifiers (layout vs layout-land) was essential to ensure a smooth transition between orientations.
+
 ---
 ## 14. Future Improvements
 Real-time API Integration: Currently, the fuel prices are static. A future iteration could integrate a public API (like Preços dos Combustíveis Online) to fetch real-time data.
@@ -119,6 +133,7 @@ Real-time API Integration: Currently, the fuel prices are static. A future itera
 Persistent Storage: Implementing a Room Database to allow users to save their "Favorite Cities" and track price history over time.
 
 Enhanced Navigation: Adding a RecyclerView to the Anti-Gravity app to support an unlimited number of cities with a smooth scrolling experience.
+
 ---
 ## 15. AI Usage Disclosure (Mandatory)
 AI Tools Used: * Gemini 3 Flash: Used via the standard interface for environment troubleshooting and report structuring.
