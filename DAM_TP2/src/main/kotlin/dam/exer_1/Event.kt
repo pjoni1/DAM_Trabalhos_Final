@@ -24,4 +24,10 @@ fun List<Event>.totalSpent(username : String): Double{
     return totalSpent
 }
 
-fun handler
+
+fun processEvents(events: List<Event>, handler: (Event) -> Unit){
+    for(event in events){
+        handler(event)
+    }
+}
+
