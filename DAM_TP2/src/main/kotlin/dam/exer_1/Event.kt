@@ -1,13 +1,15 @@
 package dam.exer_1
 
-sealed interface Event
+sealed interface Event{
+    val username: String
+}
 
 fun List<Event>.filterByUser(username: String) : List<Event>{
-    var events: List<Event>
-    var userEvents: List<String>
+    val events: List<Event> = this
+    val userEvents = mutableListOf<Event>()
     for (event in events){
         if(event.username == username){
-            userEvents.append(event)
+            userEvents.add(event)
         }
     }
     return userEvents
@@ -15,11 +17,11 @@ fun List<Event>.filterByUser(username: String) : List<Event>{
 }
 
 fun List<Event>.totalSpent(username : String): Double{
-    var events: List<Event>
-    var purchases = events.filterIsInstance<Purchase>()
-    var totalSpent = purchases.sumOf { it.amount }
+    val events: List<Event> = this
+    val userEvents = events.filterByUser(username)
+    val purchases = userEvents.filterIsInstance<Purchase>()
+    val totalSpent = purchases.sumOf { it.amount }
     return totalSpent
-
 }
 
-fun<List<Event>,
+fun handler
