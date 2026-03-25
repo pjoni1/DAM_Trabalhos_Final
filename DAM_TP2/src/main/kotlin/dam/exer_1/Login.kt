@@ -2,6 +2,7 @@ package dam.exer_1
 
 import java.sql.Timestamp
 
-class Login(val username: String, val timestamp: Long): EventIO() {
+
+class Login(override val username: String, override val timestamp: Long): EventIO() {
 
 }

@@ -1,7 +1,10 @@
 package dam.exer_1
 
+import java.sql.Timestamp
+
 sealed interface Event{
     val username: String
+    val timestamp: Long
 }
 
 fun List<Event>.filterByUser(username: String) : List<Event>{
