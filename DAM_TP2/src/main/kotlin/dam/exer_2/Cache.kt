@@ -44,4 +44,9 @@ class Cache <K : Any, V : Any>{
     //fun filterValues(predicate: (V) -> Boolean): Map<K, V>{
 
     //}
+
+    fun main() {
+        println("--- Word frequency cache ---")
+
+    }
 }

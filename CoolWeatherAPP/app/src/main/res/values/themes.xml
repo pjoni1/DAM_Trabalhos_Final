@@ -19,11 +19,4 @@
     <style name="Theme.Night" parent="Theme.CoolWeatherAPP">
         <item name="android:windowBackground">@drawable/night_bg</item>
     </style>
-
-    <style name="Theme.Day.Land" parent="Theme.CoolWeatherAPP">
-        <item name="android:windowBackground">@drawable/sunny_bg_land</item>
-    </style>
-    <style name="Theme.Night.Land" parent="Theme.CoolWeatherAPP">
-        <item name="android:windowBackground">@drawable/night_bg_land</item>
-    </style>
 </resources>
