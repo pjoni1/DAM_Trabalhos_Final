@@ -44,9 +44,35 @@ class Cache <K : Any, V : Any>{
     //fun filterValues(predicate: (V) -> Boolean): Map<K, V>{
 
     //}
+}
 
-    fun main() {
-        println("--- Word frequency cache ---")
 
-    }
+fun main() {
+    val wordFreqCache = Cache<String, Int>()
+    wordFreqCache.put("kotlin",1)
+    wordFreqCache.put("scala",1)
+    wordFreqCache.put("haskell",1)
+
+    println("--- Word frequency cache ---")
+    println("Size: ${wordFreqCache.size()}" )
+    println("Frequency of \" kotlin \": ${wordFreqCache.get("kotlin")}")
+    println("getOrPut \" kotlin \": ${wordFreqCache.getOrPut("kotlin"){0}}") //se não houver kotlin retorna 0
+    println("getOrPut \" kotlin \": ${wordFreqCache.getOrPut("java"){0}}") //se não houver java retorna 0
+    println("Size after getOrPut : ${wordFreqCache.size()}")
+    println("Transform \" kotlin \" (+1) : ${wordFreqCache.transform("kotlin"){ it + 1 }}")
+    println("Transform \" cobol \" (+1) : ${wordFreqCache.transform("cobol"){ it + 1 }}")
+    println("Snapshot: ${wordFreqCache.snapshot()}")
+
+
+    val idRegistryCache = Cache<Int, String>()
+    idRegistryCache.put(1,"Alice")
+    idRegistryCache.put(2,"Bob")
+    println("--- Id registry cache ---")
+    println("Id 1 -> ${idRegistryCache.get(1)}")
+    println("Id 2 -> ${idRegistryCache.get(2)}")
+
+    idRegistryCache.evict(1)
+    println("After evict id 1, size : ${idRegistryCache.size()}")
+    println("Id 1 after evict -> ${idRegistryCache.get(1)}")
+
 }
