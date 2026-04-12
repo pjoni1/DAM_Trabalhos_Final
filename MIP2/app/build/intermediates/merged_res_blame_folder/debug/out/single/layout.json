@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.mip2.imageviewer.app-mergeDebugResources-38:/layout/item_image.xml",
+        "source": "com.mip2.imageviewer.app-main-41:/layout/item_image.xml"
+    },
+    {
+        "merged": "com.mip2.imageviewer.app-mergeDebugResources-38:/layout/activity_main.xml",
+        "source": "com.mip2.imageviewer.app-main-41:/layout/activity_main.xml"
+    }
+]
