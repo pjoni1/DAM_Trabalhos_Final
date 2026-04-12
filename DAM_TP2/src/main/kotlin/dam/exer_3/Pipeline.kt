@@ -43,13 +43,13 @@ fun main(){
     )
 
     val pipeline = buildPipeline {
-        addStage("Trim"){}
+        addStage("Trim"){list -> list.map{it.trim()}}    //.map é uma high level function que percorre cada elemento da lista(list)
+                                                                //aplica uma transformação e retorna uma nova lista
+        addStage("Filter errors"){list -> list.filter{it.contains("ERROR")}}
 
-        addStage("Filter errors"){}
+        addStage("Uppercase"){list -> list.map{it.uppercase()}}
 
-        addStage("Uppercase"){}
-
-        addStage("Add index"){}
+       // addStage("Add index"){list -> list.joinToString {index =   }}
     }
 
     pipeline.describe()
