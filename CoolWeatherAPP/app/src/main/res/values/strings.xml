@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name" translatable="false">Cool Weather APP</string>
     <string name="cords1">Insert Latitude</string>
-    <string name="cords2">Insert Latitude</string>
-    <string name="temp_label">25.5</string>
+    <string name="cords2">Insert Longitude</string>
+    <string name="temp_label" translatable="false">- ºC</string>
     <string name="temp_title">Temperature:</string>
     <string name="update_button">Update</string>
+    <string name="pressure_label" translatable="false">- hPa</string>
+    <string name="pressure_title">Pressure:</string>
 </resources>

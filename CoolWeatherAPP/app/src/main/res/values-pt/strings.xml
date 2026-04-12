@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="cords2">Inserir longitude</string>
-    <string name="temp_label">25.5</string>
     <string name="temp_title">Temperatura:</string>
     <string name="update_button">Atualizar</string>
     <string name="cords1">Inserir latitude</string>
+    <string name="pressure_title">Pressão:</string>
 </resources>
