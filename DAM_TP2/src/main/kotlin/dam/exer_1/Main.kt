@@ -13,7 +13,7 @@ val events = listOf (
 fun main(){
     processEvents(events) { event ->
         when (event) {
-            is Login -> println("$event.username logged in at $event.timestamp")
+            is Login -> println("${event.username} logged in at $event.timestamp")
             is Purchase -> println("$event.username spent at $event.timestamp")
             is Logout -> println("$event.username logged out at $event.timestamp")
         }

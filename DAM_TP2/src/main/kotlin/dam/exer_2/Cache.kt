@@ -4,7 +4,7 @@ class Cache <K : Any, V : Any>{
     val map = mutableMapOf<K, V>()
 
     fun put(key: K, value: V){
-        map.put(key, value)
+        map[key] = value
     }
 
     fun get(key: K): V? {
@@ -19,13 +19,13 @@ class Cache <K : Any, V : Any>{
         return map.size //tmb podia ser usado map.count()
     }
 
-
+    //tenta encontrar key no mapa, se encontrar devolve, senão executa a função lambda
     fun getOrPut(key: K, default: () -> V): V {
-        return map.getOrPut(key,default)
-
+        return map.getOrPut(key,default) //default e não {default} porque default já é uma função
     }
+
     fun transform(key: K , action: (V) -> V): Boolean {
-        val value = map[key] //testa se existe
+        val value = map[key] //pega o valor
 
         if(value != null){ //se existir aplica a função lambda
             val newValue = action(value)
@@ -55,12 +55,13 @@ fun main() {
 
     println("--- Word frequency cache ---")
     println("Size: ${wordFreqCache.size()}" )
-    println("Frequency of \" kotlin \": ${wordFreqCache.get("kotlin")}")
-    println("getOrPut \" kotlin \": ${wordFreqCache.getOrPut("kotlin"){0}}") //se não houver kotlin retorna 0
-    println("getOrPut \" kotlin \": ${wordFreqCache.getOrPut("java"){0}}") //se não houver java retorna 0
-    println("Size after getOrPut : ${wordFreqCache.size()}")
-    println("Transform \" kotlin \" (+1) : ${wordFreqCache.transform("kotlin"){ it + 1 }}")
-    println("Transform \" cobol \" (+1) : ${wordFreqCache.transform("cobol"){ it + 1 }}")
+    println("Frequency of \"kotlin\": ${wordFreqCache.get("kotlin")}")
+    println("getOrPut \"kotlin\": ${wordFreqCache.getOrPut("kotlin"){0}}") //se não houver kotlin retorna 0
+    println("getOrPut \"kotlin\": ${wordFreqCache.getOrPut("java"){0}}") //se não houver java retorna 0
+    println("Size after getOrPut : ${wordFreqCache.size()}") //adicionou o java porque não havia
+    println("Transform \"kotlin\" (+1) : ${wordFreqCache.transform("kotlin"){ it + 1 }}") //it é o parametro do lamba, ou seja, o valor atual que está
+    println("Transform\" cobol\" (+1) : ${wordFreqCache.transform("cobol"){ it + 1 }}")   // guardado no cache para aquela chave
+
     println("Snapshot: ${wordFreqCache.snapshot()}")
 
 

@@ -25,6 +25,7 @@ class Pipeline {
 
 }
 
+//.() so aceita que o lambda possa ser executado dentro de um objeto do tipo Pipeline, o Pipeline torna-se o this
 fun buildPipeline(lambda: Pipeline.() -> Unit) : Pipeline { //aceita um lambda com pipeline
     val pipeline = Pipeline()   //cria instacia de pipeline
     pipeline.lambda()           //aplica o lambda ao pipeline

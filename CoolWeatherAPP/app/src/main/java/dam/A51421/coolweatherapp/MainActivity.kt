@@ -13,14 +13,18 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.gson.Gson
 import java.io.InputStreamReader
 import java.net.URL
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
-    var day = true
+    var day: Boolean = true
     private lateinit var fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 1. Configurar o Tema (Sempre antes do super e do setContentView)
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        day = hour in 7..18
+
         if (day) {
             setTheme(R.style.Theme_Day)
         } else {
@@ -30,40 +34,32 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 2. Inicializar o cliente de localização
         fusedLocationClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this)
 
-        // 3. Configurar o botão de atualização
         val btnUpdate: android.widget.Button? = findViewById(R.id.btnUpdate)
         btnUpdate?.setOnClickListener {
             updateWithCurrentLabels()
         }
 
-        // 4. Lógica de Inicialização: GPS ou Labels Padrão
         checkLocationPermissions()
     }
 
-    // Função auxiliar para organizar o onCreate
     private fun checkLocationPermissions() {
         if (androidx.core.app.ActivityCompat.checkSelfPermission(
                 this, android.Manifest.permission.ACCESS_COARSE_LOCATION
             ) != android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
-            // Se não temos permissão, pedimos ao utilizador
             androidx.core.app.ActivityCompat.requestPermissions(
                 this,
                 arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION),
                 1
             )
-            // Opcional: Chamar com valores 0.0 enquanto espera pela permissão
             updateWithCurrentLabels()
         } else {
-            // Se já temos permissão, tentamos obter a localização real
             getInitialLocation()
         }
     }
 
-    // Movemos esta função para fora do onCreate para ser acessível por todos
     private fun updateWithCurrentLabels() {
         val latLabel: TextView = findViewById(R.id.latLabel)
         val longLabel: TextView = findViewById(R.id.longLabel)
@@ -84,9 +80,21 @@ class MainActivity : AppCompatActivity() {
     private fun updateUI(request: WeatherData) {
         runOnUiThread {
             val weatherImage: ImageView = findViewById(R.id.weatherImage)
-            val pressure: TextView = findViewById(R.id.pressureValue)
             val tempLabel: TextView = findViewById(R.id.tempValue)
-            val pressureLabel: TextView = findViewById(R.id.pressureValue)
+            val pressure: TextView = findViewById(R.id.pressureValue)
+
+            val mainLayout: androidx.constraintlayout.widget.ConstraintLayout = findViewById(R.id.container)
+
+            val isDayInLocation = request.current_weather.is_day == 1
+            this.day = isDayInLocation
+
+            if (isDayInLocation) {
+               mainLayout.setBackgroundResource(R.drawable.sunny_bg)
+            } else {
+                mainLayout.setBackgroundResource(R.drawable.night_bg)
+            }
+
+            this.day = isDayInLocation
 
             val currentTemp = request.current_weather.temperature
             tempLabel.text = "$currentTemp°C"
@@ -96,25 +104,20 @@ class MainActivity : AppCompatActivity() {
 
             val mapt = getWeatherCodeMap()
             val wCode = mapt.get(request.current_weather.weathercode)
+
             val wImage = when (wCode) {
                 WMO_WeatherCode.CLEAR_SKY,
                 WMO_WeatherCode.MAINLY_CLEAR,
-                WMO_WeatherCode.PARTLY_CLOUDY -> if (day) "${wCode?.image}day" else "${wCode?.image}night"
+                WMO_WeatherCode.PARTLY_CLOUDY -> if (isDayInLocation) "${wCode?.image}day" else "${wCode?.image}night"
                 else -> wCode?.image
             }
 
-            val res = resources
-            val resID = res.getIdentifier(wImage, "drawable", packageName)
-
+            val resID = resources.getIdentifier(wImage, "drawable", packageName)
             if (resID != 0) {
                 weatherImage.setImageDrawable(getDrawable(resID))
-            } else {
-                weatherImage.setImageResource(R.drawable.fog)
-                android.util.Log.e("WEATHER_ERROR", "Não encontrei a imagem: $wImage")
             }
         }
     }
-
     private fun WeatherAPI_Call ( lat : Float , long : Float ) : WeatherData {
         12
         val reqString = buildString {

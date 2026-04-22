@@ -22,74 +22,77 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
-        android:layout_marginBottom="180dp"
+        android:layout_marginTop="176dp"
         android:text="@string/update_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/latLabel"
+        android:layout_width="219dp"
+        android:layout_height="52dp"
+        android:layout_marginEnd="236dp"
+        android:layout_marginBottom="272dp"
+        android:ems="10"
+        android:hint="@string/cords1"
+        android:inputType="numberDecimal|numberSigned"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="364dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/temp_title"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tempValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="180dp"
+        android:layout_marginStart="76dp"
+        android:layout_marginBottom="160dp"
         android:text="@string/temp_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="159dp" />
-
-    <TextView
-        android:id="@+id/pressureValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="184dp"
-        android:layout_marginBottom="536dp"
-        android:text="@string/pressure_label"
+        android:textColor="#FFFDFD"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tempValue"
-        app:layout_constraintVertical_bias="0.02" />
-
-    <EditText
-        android:id="@+id/latLabel"
-        android:layout_width="219dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="148dp"
-        android:ems="10"
-        android:hint="@string/cords1"
-        android:inputType="numberDecimal|numberSigned"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/longLabel"
-        android:layout_width="219dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="148dp"
-        android:ems="10"
-        android:hint="@string/cords2"
-        android:inputType="numberDecimal|numberSigned"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/latLabel" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="48dp"
-        android:text="@string/temp_title"
-        app:layout_constraintEnd_toStartOf="@+id/tempValue"
-        tools:layout_editor_absoluteY="159dp" />
+        app:layout_constraintStart_toEndOf="@+id/textView2" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginStart="364dp"
+        android:layout_marginBottom="128dp"
         android:text="@string/pressure_title"
-        app:layout_constraintEnd_toStartOf="@+id/pressureValue"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        android:textColor="#F8F6F6"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/pressureValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="96dp"
+        android:layout_marginBottom="128dp"
+        android:text="@string/pressure_label"
+        android:textColor="#F8F5F5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView3" />
+
+    <EditText
+        android:id="@+id/longLabel"
+        android:layout_width="219dp"
+        android:layout_height="49dp"
+        android:layout_marginEnd="236dp"
+        android:layout_marginBottom="212dp"
+        android:ems="10"
+        android:hint="@string/cords2"
+        android:inputType="numberDecimal|numberSigned"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

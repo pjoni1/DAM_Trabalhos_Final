@@ -12,7 +12,8 @@ data class CurrentWeather (
     var windspeed : Float ,
     var winddirection : Int ,
     var weathercode : Int ,
-    var time : String
+    var time : String ,
+    var is_day : Int
 )
 
 data class Hourly (

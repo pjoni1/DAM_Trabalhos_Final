@@ -5,11 +5,11 @@ import kotlin.math.sqrt
 
 data class Vec2(var x:Double,var y:Double) {
     operator fun plus(otherVector: Vec2): Vec2 { //usa se o this para diferenciar do outro vetor
-        return Vec2(this.x + otherVector.x,this.y + otherVector.y)
+        return Vec2(x + otherVector.x,y + otherVector.y)
     }
 
     operator fun minus(otherVector: Vec2): Vec2 {
-        return Vec2(this.x - otherVector.x,this.y - otherVector.y)
+        return Vec2(x - otherVector.x,y - otherVector.y)
     }
 
     operator fun times(multiplier: Double): Vec2 {
@@ -25,7 +25,7 @@ data class Vec2(var x:Double,var y:Double) {
     }
 
     fun dot(otherVector: Vec2): Double {
-        return this.x * otherVector.x + this.y * otherVector.y
+        return x * otherVector.x + y * otherVector.y
     }
 
     fun normalized(): Vec2 {
@@ -37,6 +37,9 @@ data class Vec2(var x:Double,var y:Double) {
         }
     }
 
+    //devolve 1 se o primeiro valor é maior q o segundo
+    //devolve -1 se o primeiro valor é menor q o segundo
+    //devolve 0 se forem iguais
     operator fun compareTo(otherVector: Vec2): Int {
         val mag = this.magnitude()
         val otherMag = otherVector.magnitude()
