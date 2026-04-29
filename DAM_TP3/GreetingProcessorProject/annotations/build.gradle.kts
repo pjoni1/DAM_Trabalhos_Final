@@ -1,0 +1,21 @@
+plugins {
+    kotlin("jvm")
+}
+
+group = "org.example"
+version = "1.0-SNAPSHOT"
+
+
+dependencies {
+    testImplementation(kotlin("test"))
+    implementation(kotlin("stdlib"))
+}
+
+tasks.test {
+    useJUnitPlatform ()
+}
+
+kotlin {
+    jvmToolchain (23)
+}
+

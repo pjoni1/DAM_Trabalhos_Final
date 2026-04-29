@@ -64,7 +64,8 @@ class GreetingProcessor : AbstractProcessor() {
 
             // Tenta obter a mensagem da anotação (ajusta conforme o campo na tua annotation Greeting)
             // Se a tua anotação não tiver o campo 'message', este trecho pode precisar de ajuste.
-            val greetingMessage = "Hello from $methodName!"
+            val annotation = method.getAnnotation(Greeting::class.java)
+            val greetingMessage = annotation?.message ?: "Hello from $methodName!"
 
             val methodBuilder = FunSpec.builder(methodName)
                 .addModifiers(KModifier.PUBLIC, KModifier.FINAL)

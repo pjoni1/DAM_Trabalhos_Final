@@ -12,4 +12,3 @@ open class MyClass {
         println ("Computing something important...")
     }
 }
-}
