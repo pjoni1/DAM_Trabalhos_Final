@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7f2c9e96-f689-48cb-8dfc-d14882fb1f20" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/annotations/src/main/kotlin/com/example/annotations/Greeting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/annotations/src/main/kotlin/com/example/annotations/Greeting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/com/example/app/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/com/example/app/Main.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/com/example/app/MyClass.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/com/example/app/MyClass.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processor/src/main/kotlin/com/example/processor/GreetingProcessor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/processor/src/main/kotlin/com/example/processor/GreetingProcessor.kt" afterDir="false" />
+    <list default="true" id="7f2c9e96-f689-48cb-8dfc-d14882fb1f20" name="Changes" comment="first commit">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,6 +100,19 @@
       <option name="presentableId" value="Default" />
       <updated>1777476287333</updated>
     </task>
+    <task id="LOCAL-00001" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1777500045464</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1777500045464</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="first commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="first commit" />
   </component>
 </project>
