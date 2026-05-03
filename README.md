@@ -1,8 +1,8 @@
-# Assignment 2 — Tutorial2-WeatherApp
+# Assignment 3 — Tutorial3 - JPCompose
 
 Course: DAM
 Student: João Rosa
-Date: 04/26
+Date: 05/26
 Repository URL: https://github.com/pjoni1/DAM_Trabalhos_Final/tree/master
 ---
 
