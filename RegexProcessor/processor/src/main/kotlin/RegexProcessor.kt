@@ -8,7 +8,6 @@ import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
-import javax.tools.Diagnostic
 
 @AutoService(Processor::class) // Regista o processador automaticamente
 @SupportedAnnotationTypes("annotations.Extract")
@@ -16,11 +15,9 @@ import javax.tools.Diagnostic
 class RegexProcessor : AbstractProcessor() {
 
     override fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        // 1. Encontrar todos os elementos anotados com @Extract
         val annotatedElements = roundEnv.getElementsAnnotatedWith(Extract::class.java)
         if (annotatedElements.isEmpty()) return false
 
-        // 2. Agrupar por classe (porque um DataProcessor pode ter vários métodos @Extract)
         val groupedByClass = annotatedElements.groupBy { it.enclosingElement as TypeElement }
 
         groupedByClass.forEach { (classElement, methods) ->
@@ -35,22 +32,17 @@ class RegexProcessor : AbstractProcessor() {
         val originalClassName = classElement.simpleName.toString()
         val generatedClassName = "${originalClassName}Extractor"
 
-        // Criar a classe que herda da original
         val classBuilder = TypeSpec.classBuilder(generatedClassName)
             .superclass(classElement.asType().asTypeName())
             .addModifiers(KModifier.PUBLIC)
-            // Adicionar construtor que recebe 'input' e passa para a super classe
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameter("input", String::class)
                     .build()
             )
 
-        // No teu caso, como a classe abstrata recebe (val input: String),
-        // precisamos de garantir que passamos esse parâmetro para o super()
         classBuilder.addSuperclassConstructorParameter("input")
 
-        // 3. Implementar cada método anotado
         methods.forEach { method ->
             val executableMethod = method as ExecutableElement
             val methodName = executableMethod.simpleName.toString()
