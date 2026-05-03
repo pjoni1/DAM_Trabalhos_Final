@@ -1,110 +1,105 @@
-# Assignment 1 — Tutorial1-HelloWorld
+# Assignment 3 — Tutorial3 - JPCompose
 
 Course: DAM
 Student: João Rosa
-Date: 03/26
+Date: 05/26
 Repository URL: https://github.com/pjoni1/DAM_Trabalhos_Final/tree/master
 ---
+
 ## 1. Introduction
-This assignment served as an introduction to the Android development ecosystem and the Kotlin programming language. The main objectives were to configure the development environment (IntelliJ IDEA and Android Studio), understand basic Kotlin syntax, and create a functional application featuring adaptive layouts and customized graphical resources.
+This assignment focused on advanced Android development, specifically consuming REST APIs, implementing modern architectural patterns (MVVM), and exploring Assisted Code Generation using the AntiGravity framework. The goal was to build a functional Weather Application (MIP-1) and an Image Gallery app using AI-driven workflows (MIP-2).
+
 ---
+
 ## 2. System Overview
-The solution is divided into three main developmental stages, showcasing a progression from pure logic to complex UI management:
+The project is divided into two main components:
 
-  -Kotlin Fundamental Exercises: A suite of console-based programs focusing on data types, control flow (using when expressions), and robust error handling with try-catch blocks. Key features include a multi-base calculator (Decimal/Hexadecimal) and functional sequence generation.
+  MIP-1: Cool Weather Application: A manually developed app that fetches real-time weather data based on the user's location, featuring adaptive layouts and multi-language support.
 
-  -Android Studio Foundational Tasks: Initial implementation of Android components within the Android Studio IDE. These exercises focused on understanding the Activity lifecycle, Project Structure (Manifests, Java/Kotlin sources, and Resources), and basic View interaction.
-
-  -Anti-Gravity Fuel Application: The final project component consisting of a gas price monitor. It features a custom "Anti-Gravity" theme and implements a responsive UI that adapts to different screen orientations (Portrait and Landscape) using specific resource qualifiers and ConstraintLayout.
+  MIP-2: Assisted Image Gallery: An application developed using the AntiGravity tool, following a "Documentation-First" approach to consume a public Image API (e.g., Unsplash).
   
 ---
+
 ## 3. Architecture and Design
 
-The solution follows the standard Android architectural components:
+The solution adheres to the MVVM (Model-View-ViewModel) pattern:
 
-  -Logic Layer: Kotlin files implementing OOP principles (Classes and Objects).
-  
-  -Presentation Layer: XML-based layouts using ConstraintLayout for a responsive UI.
-  
-  -Resource Organization: Separation of concerns using res/values for strings/colors and res/layout for UI structure, including specific qualifiers for landscape mode
+  Model: Data classes representing API responses (Weather/Images) and Repository layers for network calls.
+
+  ViewModel: Manages UI state and survives configuration changes (like rotation).
+
+  View: XML-based layouts using ConstraintLayout, RecyclerView for lists, and ViewBinding for type-safe view access.
+
+  Networking: Integration with Retrofit and Gson for JSON parsing
   
 ---
+
 ## 4. Implementation
-The implementation was divided into three distinct modules, focusing on core programming logic and mobile interface design.
-### 4.1. Kotlin Fundamentals (Ex. 1-3)
+T4.1. MIP-1: Weather App (Manual Development)
 
-  -Console Calculator: Developed a multi-base calculator using when expressions. It performs arithmetic, boolean, and bitwise operations. To handle the hexadecimal requirement, Float.toBits() and Integer.toHexString() were used to extract the raw memory representation.
+  API Integration: Connected to a Weather API (OpenWeather/WeatherAPI) to fetch current conditions and forecasts.
 
-  -Physics Simulator: Used generateSequence to calculate ball bounces. 
+  Adaptive UI: Implemented layouts that adapt to portrait and landscape modes using resource qualifiers (layout-land).
 
-  -Robustness: Integrated a centralized try-catch block to manage InputMismatchException, preventing crashes during invalid user input.
+  Internationalization: Added support for multiple languages (e.g., English and Portuguese) via strings.xml.
 
-### 4.2. Android Studio & Anti-Gravity Fuel App
+4.2. MIP-2: Assisted Code Generation (AntiGravity)
 
-  -UI Architecture: Utilized ConstraintLayout to build the "Anti-Gravity Fuel" interface. The layout presents fuel prices (Gasoline/Diesel) for multiple cities.
+  Documentation-First Workflow: Created a suite of Markdown files in docs/ (Overview, Architecture, Implementation Plan) before generating code.
 
-  -Adaptability: Created specialized resource qualifiers (e.g., layout-land) to provide a custom experience when the device is rotated, ensuring no overlapping of graphical elements.
-
-  -Resource Management: All text labels and color schemes were offloaded to strings.xml and colors.xml to follow Android best practices for maintainability
+  AI Collaboration: Used the AntiGravity agent to implement the Image API consumer, following the specific steps defined in docs/08_implementation_plan.md.
   
 ---
+
 ## 5. Testing and Validation
-Functional Testing: The calculator was tested with edge cases such as division by zero and extremely large integers to verify bitwise shift behavior.
+API Reliability: Tested error handling for network timeouts or invalid API keys.
 
-Input Stress Test: Intentionally entered non-numeric characters into the console to confirm that the try-catch exception handling logic gracefully prompts the error message.
+UI Consistency: Verified that RecyclerView scales correctly and images load asynchronously (using Glide or Coil) without blocking the main thread.
 
-Layout Validation: Used the Android Studio Emulator to verify the "Anti-Gravity" theme across different screen densities. Confirmed that the landscape orientation correctly displays all city data without clipping.
-
-Git Integrity: Verified the commit history through the terminal to ensure all incremental changes were correctly tracked after the initial repository mapping fix.
+MVVM Integrity: Confirmed that data persists during screen rotations using the ViewModel.
 
 ---
+
 ## 6. Usage Instructions
-Environment Setup: Ensure IntelliJ IDEA and Android Studio are installed.
+API Keys: Obtain keys from the Weather API and Image API and add them to the project (e.g., in gradle.properties or a config file).
 
-Kotlin Exercises: Navigate to the dam package. Right-click on the desired exercise file (e.g., exer_2.kt) and select "Run".
+Environment: Open the project in Android Studio (Ladybug or newer).
 
-Android Application: Open the AntiGravityFuel project in Android Studio. Wait for the Gradle sync to complete and click the "Run" button (Shift + F10) to deploy to an emulator or physical device.
-
-Requirements: Android API level 30 or higher is recommended for the best experience.
+AntiGravity: To review the MIP-2 process, check the docs/ folder and the prompt logs.
 
 ---
 # Autonomous Software Engineering Sections - only for [AC OK, AI OK] sections
 ## 7. Prompting Strategy
-The prompting strategy followed a dual-path approach, utilizing both reactive, user-written prompts for technical troubleshooting and a highly structured, role-based "Master Prompt" for the autonomous agent workflow.
+For MIP-2, I employed a Structured Agentic Prompting strategy. Instead of asking for code snippets, I provided the AntiGravity agent with the full context of the assignment and the required Markdown structure.
 
-  Reactive Technical Prompting (User-Written): Specific prompts were authored to resolve environment-specific "blockers" and syntax questions encountered during the development of the Kotlin exercises. These prompts were direct and targeted at immediate problem-solving.
-
-  Example: "The directory is registered as a Git root, but no repositories were found. How do I fix this mapping in the IntelliJ settings?" or "How can I format a list of Doubles to display only two decimal places in Kotlin?"
-
-  Structured Agentic Prompting (Anti-Gravity Framework): For the development of the final mobile application, a sophisticated prompting technique was used to define the AI as an autonomous software engineering agent. This prompt provided high-level context, specific goals, and strict constraints before any execution began.  
-
-  Strategy Evolution: The strategy evolved from using AI as a simple "search engine" for fixing Git and IDE errors to utilizing it as a high-level architectural consultant. By providing a detailed "Master Prompt" in the Anti-Gravity environment, the interaction shifted from simple code-snippet requests to a professional "Plan-Review-Execute" workflow.
+   Methodology: "Plan-Review-Execute". I required the agent to confirm the implementation plan in 08_implementation_plan.md before writing any Kotlin files.
   
 ---
+
 ## 8. Autonomous Agent Workflow
-The AI acted strictly as a Technical Assistant and Troubleshooting Consultant, not as a coder for the logic exercises. The workflow was as follows:
+The AntiGravity agent acted as a Junior Developer under my supervision:
 
-  -Infrastructure Support: Resolving the mapping issues between the project directory and the Git repository when the IDE failed to detect the VCS.
+  Analysis: It parsed the requirements for the Image API.
 
-  -UI/UX Design Consultation: Providing conceptual guidance on how to organize the "Anti-Gravity" theme and ensuring the responsiveness of the fuel price display.
+  Drafting: It proposed the Data Models and Architecture in Markdown.
 
-  -Documentation & Formatting: Assisting in the translation and professional structuring of this report to ensure technical accuracy in the final delivery.
+  Execution: Once I approved the plan, it generated the Retrofit interfaces, ViewModels, and Layouts.
   
 ---
+
 ## 9. Verification of AI-Generated Artifacts
-Verification was focused on environment fixes and UI suggestions:
+Code Review: Every file generated by AntiGravity was manually reviewed to ensure it didn't use deprecated libraries.
 
-  -Environment Verification: Each Git command suggested by the AI was tested in the terminal to ensure it correctly re-linked the repository without data loss.
-
-  -Manual UI Review: Suggestions regarding layout orientation were manually implemented and adjusted in the Android Studio Layout Editor to match the specific "Anti-Gravity" visual requirements.
-
-  -Fact-Checking: Any technical explanation provided by the AI for the report was cross-referenced with official Android and Kotlin documentation.
+Architectural Check: I verified that the AI didn't leak context into the ViewModels, maintaining a clean separation of concerns
   
 ---
+
 ## 10. Human vs AI Contribution
-Human: Performed the installation, wrote the core Kotlin exercises, designed the UI manually in the editor, and conducted all emulator tests.
-AI: Provided conceptual explanations and helped resolve environment-specific configuration errors.
+Human: Conceptual design of MIP-1, manual coding of the Weather logic, API selection, and final integration/debugging.
+
+AI: Generation of boilerplate code for MIP-2, drafting of technical documentation, and optimization of the Implementation Plan
 ---
+
 ## 11. Ethical and Responsible Use
 Risk Mitigation: To avoid the risk of over-reliance, AI was strictly excluded from the logic development and coding phases of the Kotlin exercises and Android tasks. This ensured that the core learning objectives of the course were met through manual implementation.
 
@@ -128,11 +123,9 @@ Android Lifecycle: Understanding how resources are loaded based on qualifiers (l
 
 ---
 ## 14. Future Improvements
-Real-time API Integration: Currently, the fuel prices are static. A future iteration could integrate a public API (like Preços dos Combustíveis Online) to fetch real-time data.
+Offline Cache: Implementing Room to cache weather and image data.
 
-Persistent Storage: Implementing a Room Database to allow users to save their "Favorite Cities" and track price history over time.
-
-Enhanced Navigation: Adding a RecyclerView to the Anti-Gravity app to support an unlimited number of cities with a smooth scrolling experience.
+Unit Testing: Adding JUnit tests for the ViewModels
 
 ---
 ## 15. AI Usage Disclosure (Mandatory)
