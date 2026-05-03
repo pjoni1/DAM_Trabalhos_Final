@@ -7,57 +7,66 @@ Repository URL: https://github.com/pjoni1/DAM_Trabalhos_Final/tree/master
 ---
 
 ## 1. Introduction
-This assignment focused on advanced Android development, specifically consuming REST APIs, implementing modern architectural patterns (MVVM), and exploring Assisted Code Generation using the AntiGravity framework. The goal was to build a functional Weather Application (MIP-1) and an Image Gallery app using AI-driven workflows (MIP-2).
+This assignment focused on two high-level pillars of Android and Kotlin development: Metaprogramming (via Annotation Processing) and Modern UI development with Jetpack Compose. The goal was to implement a custom Regex Annotation Processor to automate boilerplate code and a Weather Application that consumes REST APIs using modern architecture.
 
 ---
 
 ## 2. System Overview
-The project is divided into two main components:
+The project consists of two distinct challenges:
 
-  MIP-1: Cool Weather Application: A manually developed app that fetches real-time weather data based on the user's location, featuring adaptive layouts and multi-language support.
+  Regex Annotation Processor [Optional Challenge]: A multi-module Kotlin project designed to generate code at compile-time. It uses custom annotations (@Extract) to automatically implement data extraction logic based on Regular Expressions.
 
-  MIP-2: Assisted Image Gallery: An application developed using the AntiGravity tool, following a "Documentation-First" approach to consume a public Image API (e.g., Unsplash).
-  
+  Weather Application (Jetpack Compose): A modern Android application focused on state management, asynchronous data fetching, and a reactive UI built entirely with Compose.
 ---
 
 ## 3. Architecture and Design
 
-The solution adheres to the MVVM (Model-View-ViewModel) pattern:
+3.1. Annotation Processor (Multi-Module)
 
-  Model: Data classes representing API responses (Weather/Images) and Repository layers for network calls.
+To ensure a clean separation between the generator and the consumer, the system was split into three modules:
 
-  ViewModel: Manages UI state and survives configuration changes (like rotation).
+  annotations: Contains the definition of the @Extract annotation.
 
-  View: XML-based layouts using ConstraintLayout, RecyclerView for lists, and ViewBinding for type-safe view access.
+  processor: The "engine" that uses KAPT (Kotlin Annotation Processing Tool) and KotlinPoet to write the implementation classes during compilation.
 
-  Networking: Integration with Retrofit and Gson for JSON parsing
+  app: The consumer module where the abstract logic is defined and the generated code is utilized.
+
+3.2. Weather App
+
+The solution follows the MVVM pattern:
+
+  Model: Retrofit interfaces and data classes for OpenWeatherMap API.
+
+  ViewModel: Handles the UI State, using StateFlow or mutableStateOf to push updates to the UI.
+
+  View: Built with Jetpack Compose, utilizing Composables for a declarative UI approach
   
 ---
 
 ## 4. Implementation
-T4.1. MIP-1: Weather App (Manual Development)
+4.1. Regex Processor Logic
 
-  API Integration: Connected to a Weather API (OpenWeather/WeatherAPI) to fetch current conditions and forecasts.
+  Code Generation: Instead of manual parsing, the RegexProcessor scans for methods annotated with @Extract(regex = "...").
 
-  Adaptive UI: Implemented layouts that adapt to portrait and landscape modes using resource qualifiers (layout-land).
+  Automation: Using KotlinPoet, the processor generates a DataProcessorExtractor class that overrides abstract methods, implementing the Regex().find() logic automatically.
 
-  Internationalization: Added support for multiple languages (e.g., English and Portuguese) via strings.xml.
+  Compile-time Safety: Errors in regex or structure are caught during the build phase, not at runtime.
 
-4.2. MIP-2: Assisted Code Generation (AntiGravity)
+4.2. Weather App (Compose)
 
-  Documentation-First Workflow: Created a suite of Markdown files in docs/ (Overview, Architecture, Implementation Plan) before generating code.
+  Networking: Integration with Retrofit and OkHttp to fetch real-time JSON data.
 
-  AI Collaboration: Used the AntiGravity agent to implement the Image API consumer, following the specific steps defined in docs/08_implementation_plan.md.
-  
+  State Management: Implementation of loading, success, and error states to ensure a robust User Experience.
+
+  Formatting: Handling string formatting and URL encoding for API queries (e.g., handling spaces in city names).
 ---
 
 ## 5. Testing and Validation
-API Reliability: Tested error handling for network timeouts or invalid API keys.
+Annotation Reflection: Verified that the generated class DataProcessorExtractor correctly inherits from the base abstract class and implements the primary constructor.
 
-UI Consistency: Verified that RecyclerView scales correctly and images load asynchronously (using Glide or Coil) without blocking the main thread.
+Regex Accuracy: Tested the extraction logic with inputs like "Name : John Address : 123 Street", ensuring group values are correctly captured.
 
-MVVM Integrity: Confirmed that data persists during screen rotations using the ViewModel.
-
+API Resilience: Validated the weather app's behavior when faced with network instability or incorrect city queries.
 ---
 
 ## 6. Usage Instructions
@@ -70,10 +79,11 @@ AntiGravity: To review the MIP-2 process, check the docs/ folder and the prompt 
 ---
 # Autonomous Software Engineering Sections - only for [AC OK, AI OK] sections
 ## 7. Prompting Strategy
-For MIP-2, I employed a Structured Agentic Prompting strategy. Instead of asking for code snippets, I provided the AntiGravity agent with the full context of the assignment and the required Markdown structure.
+For the advanced sections, I employed a "Modular Architecture First" strategy.
 
-   Methodology: "Plan-Review-Execute". I required the agent to confirm the implementation plan in 08_implementation_plan.md before writing any Kotlin files.
-  
+  Methodology: I used AI to troubleshoot the Gradle multi-module synchronization, ensuring that the kapt dependencies were correctly mapped between the :processor and :app modules.
+
+  Collaboration: The AI acted as a senior consultant for KotlinPoet syntax, helping to define the TypeSpec and FunSpec structures needed for valid code generation
 ---
 
 ## 8. Autonomous Agent Workflow
@@ -115,17 +125,22 @@ Transparency: This report serves as a full disclosure of AI involvement, clearly
 Git was used to track progress. The history shows a clear evolution: initial environment setup, Kotlin logic implementation, Android UI design, and finally, resource optimization
 ---
 ## 13. Difficulties and Lessons Learned
-Git Root Mapping: The main technical hurdle was the IntelliJ VCS synchronization. The project was registered as a root but wouldn't detect commits initially. This was resolved by manually re-linking the directory in the IDE settings and using the terminal to force the tracking of files.
+KAPT & Gradle Sync: Managing dependencies in a multi-module project was the biggest hurdle. Understanding how the processor must be compiled before the app can see the generated classes was a key takeaway.
 
-ConstraintLayout Chains: Aligning multiple elements symmetrically in the Anti-Gravity app required learning how to use chains and guidelines effectively to avoid overlapping components during screen rotation.
+Regex Specificity: Small discrepancies in white spaces between the Regex string and the input string led to null values, highlighting the need for robust regex patterns like \\s*.
 
-Android Lifecycle: Understanding how resources are loaded based on qualifiers (layout vs layout-land) was essential to ensure a smooth transition between orientations.
-
+Code Generation Lifecycle: Learning that generated code resides in build/generated/source/kapt and understanding how to trigger a "Rebuild" to refresh the generated artifacts.
 ---
 ## 14. Future Improvements
-Offline Cache: Implementing Room to cache weather and image data.
+Incremental Annotation Processing: Migrating from KAPT to KSP (Kotlin Symbol Processing). KSP is specifically designed for Kotlin, offers better performance, and has a more idiomatic API for navigating Kotlin code, which would speed up the build process.
 
-Unit Testing: Adding JUnit tests for the ViewModels
+Incremental Build Support: Optimizing the RegexProcessor to support incremental compilation, ensuring that the processor only regenerates files for classes that were actually modified, rather than rebuilding the entire generated module.
+
+Advanced Regex Validation: Implementing a "Fail-Fast" mechanism where the Annotation Processor validates the syntax of the Regular Expression at compile-time. If the regex is invalid, the build would fail with a specific error message, preventing runtime PatternSyntaxException errors.
+
+Support for Multiple Matches: Expanding the @Extract logic to support returning a List<String> for cases where the regex finds multiple occurrences in the input string, rather than just the first match.
+
+Unit Testing for Generated Code: Adding a test suite that specifically targets the generated DataProcessorExtractor to ensure that the extraction logic remains consistent even after changes to the processor's engine
 
 ---
 ## 15. AI Usage Disclosure (Mandatory)
