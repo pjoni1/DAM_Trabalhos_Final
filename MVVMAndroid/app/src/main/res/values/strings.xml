@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">MVVMWeatherApp</string>
+    <string name="app_name" translatable="false">Cool Weather App</string>
+    <string name="label_latitude" translatable="false">Latitude</string>
+    <string name="label_longitude" translatable="false">Longitude</string>
+    <string name="btn_update">Update Weather</string>
+    <string name="label_temperature">Temperature</string>
+    <string name="label_wind_speed">Wind Speed</string>
+    <string name="label_pressure">Pressure</string>
+    <string name="label_time">Time</string>
 </resources>

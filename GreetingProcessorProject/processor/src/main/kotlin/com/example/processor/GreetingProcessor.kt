@@ -18,7 +18,6 @@ class GreetingProcessor : AbstractProcessor() {
     override fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
         val classMethodMap = mutableMapOf<TypeElement, MutableList<ExecutableElement>>()
 
-        // Encontrar todos os métodos anotados com @Greeting
         for (element in roundEnv.getElementsAnnotatedWith(Greeting::class.java)) {
             if (element is ExecutableElement) {
                 val enclosingClass = element.enclosingElement as TypeElement
@@ -26,7 +25,6 @@ class GreetingProcessor : AbstractProcessor() {
             }
         }
 
-        // Gerar classes wrapper para cada classe que contém métodos anotados
         for ((classElement, methods) in classMethodMap) {
             generateKotlinWrapperClass(classElement, methods)
         }
@@ -38,8 +36,6 @@ class GreetingProcessor : AbstractProcessor() {
         val packageName = processingEnv.elementUtils.getPackageOf(classElement).toString()
         val originalClassName = classElement.simpleName.toString()
         val wrapperClassName = "${originalClassName}Wrapper"
-
-        // Criar a classe wrapper usando composição
         val classBuilder = TypeSpec.classBuilder(wrapperClassName)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
@@ -53,7 +49,6 @@ class GreetingProcessor : AbstractProcessor() {
             )
             .addModifiers(KModifier.PUBLIC, KModifier.FINAL)
 
-        // Gerar métodos no wrapper
         for (method in methods) {
             val methodName = method.simpleName.toString()
             val parameters = method.parameters.map { param ->
@@ -61,9 +56,6 @@ class GreetingProcessor : AbstractProcessor() {
             }
 
             val arguments = method.parameters.joinToString(", ") { it.simpleName.toString() }
-
-            // Tenta obter a mensagem da anotação (ajusta conforme o campo na tua annotation Greeting)
-            // Se a tua anotação não tiver o campo 'message', este trecho pode precisar de ajuste.
             val annotation = method.getAnnotation(Greeting::class.java)
             val greetingMessage = annotation?.message ?: "Hello from $methodName!"
 
@@ -76,12 +68,10 @@ class GreetingProcessor : AbstractProcessor() {
             classBuilder.addFunction(methodBuilder.build())
         }
 
-        // Construir o ficheiro Kotlin
         val file = FileSpec.builder(packageName, wrapperClassName)
             .addType(classBuilder.build())
             .build()
 
-        // Escrever o ficheiro gerado no diretório correto do KAPT
         try {
             val kaptKotlinGeneratedDir = processingEnv.options["kapt.kotlin.generated"]
             if (kaptKotlinGeneratedDir != null) {

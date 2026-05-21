@@ -28,7 +28,7 @@ fun WeatherUI ( weatherViewModel : WeatherViewModel = viewModel () ) {
     val seaLevelPressure = weatherUIState . seaLevelPressure
     val time = weatherUIState . time
     val configuration = LocalConfiguration . current
-    val day = true // Must change this in the future
+    val day = weatherUIState.isDay
     val mapt = getWeatherCodeMap () ;
     val wCode = mapt . get ( weathercode )
     val wImage = when ( wCode ) {
@@ -53,13 +53,12 @@ fun WeatherUI ( weatherViewModel : WeatherViewModel = viewModel () ) {
             seaLevelPressure ,
             time ,
             onLatitudeChange = {
-                    newValue -> newValue . toFloatOrNull () ?. let {
-                weatherViewModel . updateLatitude ( it ) }
+                    newValue ->
+                weatherViewModel.updateLatitude(newValue)
             },
             onLongitudeChange = {
-
-                    newValue -> newValue . toFloatOrNull () ?. let {
-                weatherViewModel . updateLongitude ( it ) }
+                    newValue ->
+                weatherViewModel.updateLongitude(newValue)
             },
             onUpdateButtonClick = {
                 weatherViewModel . fetchWeather ()
@@ -78,13 +77,11 @@ fun WeatherUI ( weatherViewModel : WeatherViewModel = viewModel () ) {
             time ,
             onLatitudeChange = {
                     newValue ->
-                newValue . toFloatOrNull () ?. let {
-                    weatherViewModel . updateLatitude ( it ) }
+                weatherViewModel.updateLatitude(newValue)
             },
             onLongitudeChange = {
                     newValue ->
-                newValue . toFloatOrNull () ?. let {
-                    weatherViewModel . updateLongitude ( it ) }
+                weatherViewModel.updateLongitude(newValue)
             },
             onUpdateButtonClick = {
                 weatherViewModel . fetchWeather ()
@@ -96,8 +93,8 @@ fun WeatherUI ( weatherViewModel : WeatherViewModel = viewModel () ) {
 @Composable
 fun PortraitWeatherUI(
     wIcon: Int,
-    latitude: Float,
-    longitude: Float,
+    latitude: String,
+    longitude: String,
     temperature: Float,
     windSpeed: Float,
     windDirection: Int,
@@ -142,8 +139,8 @@ fun PortraitWeatherUI(
 @Composable
 fun LandscapeWeatherUI(
     wIcon: Int,
-    latitude: Float,
-    longitude: Float,
+    latitude: String,
+    longitude: String,
     temperature: Float,
     windSpeed: Float,
     windDirection: Int,

@@ -5,10 +5,53 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f2c9e96-f689-48cb-8dfc-d14882fb1f20" name="Changes" comment="first commit">
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/res/values-en/strings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/res/values-pt/strings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/proguard-rules.pro" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/androidTest/java/dam/a51421/nutriflow/ExampleInstrumentedTest.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/MainActivity.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/components/Scaffold.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/DashboardScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/LogFoodScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MainScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MealPlanScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/ProfileScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/VaultScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/theme/Color.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/theme/Theme.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/theme/Type.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/drawable/ic_launcher_background.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/drawable/ic_launcher_foreground.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-hdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-hdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-mdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-mdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xhdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xxhdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/values/colors.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/values/themes.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/xml/backup_rules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/xml/data_extraction_rules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/test/java/dam/a51421/nutriflow/ExampleUnitTest.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NutriFlow/gradle/libs.versions.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/processor/src/main/kotlin/com/example/processor/GreetingProcessor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/processor/src/main/kotlin/com/example/processor/GreetingProcessor.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/ui/WeatherScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/ui/WeatherScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/ui/WeatherUIState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/ui/WeatherUIState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/viewmodel/WeatherViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/viewmodel/WeatherViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../RegexProcessor/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../RegexProcessor/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../RegexProcessor/processor/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../RegexProcessor/processor/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,26 +99,26 @@
     <option name="showLibraryContents" value="true" />
     <option name="showScratchesAndConsoles" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Gradle.GreetingProcessorProject [:app:com.example.app.MainKt.main()].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/adeus/Desktop/Escola/3Ano2Sem/DAM/DAM_Trabalhos_Final/GreetingProcessorProject",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.GreetingProcessorProject [:app:com.example.app.MainKt.main()].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/adeus/Desktop/Escola/3Ano2Sem/DAM/DAM_Trabalhos_Final/GreetingProcessorProject&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.app.MainKt" />
