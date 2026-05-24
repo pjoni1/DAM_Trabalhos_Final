@@ -9,6 +9,7 @@ import java.awt.event.ActionListener
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
+import kotlinx.coroutines.channels.Channel
 
 enum class Variant {
     BLOCKING,         // Request1Blocking
@@ -101,14 +102,30 @@ interface Contributors: CoroutineScope {
                     }
                 }.setUpCancellation()
             }
-            CHANNELS -> {  // Performing requests concurrently and showing progress
-                launch(Dispatchers.Default) {
-                    loadContributorsChannels(service, req) { users, completed ->
+            CHANNELS -> { // Performing requests concurrently and showing progress
+                // launch ( Dispatchers . Default ) {
+                // loadContributorsChannels ( service , req ) { users , completed ->
+                // withContext ( Dispatchers . Main ) {
+                // updateResults ( users , startTime , completed )
+                // }
+                // }
+                // }. setUpCancellation ()
+                launch ( Dispatchers.Default ) {
+                    val progressChannel = Channel <Pair<List<User>,Boolean>>(kotlinx.coroutines.channels.Channel.BUFFERED)
+                    launch ( Dispatchers.Default) {
+                        loadContributorsChannels(service,req) {users,completed ->
+                            progressChannel.send(Pair(users, completed))
+                        }
+                        progressChannel.close()
+                    }
+                    for (progress in progressChannel) {
+                        val users = progress.first
+                        val completed = progress.second
                         withContext(Dispatchers.Main) {
-                            updateResults(users, startTime, completed)
+                            updateResults(users,startTime,completed)
                         }
                     }
-                }.setUpCancellation()
+                }. setUpCancellation ()
             }
         }
     }
