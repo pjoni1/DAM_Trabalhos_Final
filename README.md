@@ -1,4 +1,4 @@
-# Assignment 3 — Tutorial3 - JPCompose
+# Assignment 4 — Tutorial4-Flows&Firebase
 
 Course: DAM
 Student: João Rosa
@@ -7,151 +7,125 @@ Repository URL: https://github.com/pjoni1/DAM_Trabalhos_Final/tree/master
 ---
 
 ## 1. Introduction
-This assignment focused on two high-level pillars of Android and Kotlin development: Metaprogramming (via Annotation Processing) and Modern UI development with Jetpack Compose. The goal was to implement a custom Regex Annotation Processor to automate boilerplate code and a Weather Application that consumes REST APIs using modern architecture.
+This assignment focused on three high-level pillars of modern Android and cloud-native application development: Reactive programming with Kotlin Flows and Coroutines, multimodal integration with Artificial Intelligence (Google Gemini API), and cloud architecture infrastructure using the Google Firebase platform. The goal was to build robust, asynchronous streams, implement advanced image and text processing via LLMs, and extend a collaborative, production-ready Notes Application.
 
 ---
 
 ## 2. System Overview
-The project consists of two distinct challenges:
+The project consists of three core engineering challenges:
 
-  Regex Annotation Processor [Optional Challenge]: A multi-module Kotlin project designed to generate code at compile-time. It uses custom annotations (@Extract) to automatically implement data extraction logic based on Regular Expressions.
+  Reactive Streams (intro-coroutines V2): A Kotlin multi-threaded data pipeline optimized to handle loading states asynchronously through StateFlow and managing progress-reports safely through robust Channels with back-pressure.
 
-  Weather Application (Jetpack Compose): A modern Android application focused on state management, asynchronous data fetching, and a reactive UI built entirely with Compose.
+  AI Assistant & Image Processing (Gemini Starter): An Android ecosystem that communicates with Google's Gemini LLM (gemini-1.5-flash) via typed data classes and JSON serialization to perform multimodal analysis (text + image) and structured text transformations.
+
+  Notes Pro Application (Firebase Integration): A feature-rich Android app utilizing XML Views, completely integrated with Firebase Authentication, Cloud Storage (for binary file hosting), and Cloud Firestore for non-relational database persistence.
+
 ---
 
 ## 3. Architecture and Design
 
-3.1. Annotation Processor (Multi-Module)
+3.1. Asynchronous Data Streams (Flows & Channels)
+The reactive data system utilizes a clean separation between producers and consumers:
+  StateFlow Architecture: Implements the Backing Property Pattern (`_loadingState` and `loadingState`) inside the UI controllers to expose immutable reactive structures that emit layout adjustments instantly.
+  Channel Pipeline: Replaces traditional intermediate callbacks with buffered `Channel<Pair<List<User>, Boolean>>` instances to decouple data aggregation from the Android main UI thread.
 
-To ensure a clean separation between the generator and the consumer, the system was split into three modules:
+3.2. Firebase & Notes Pro Architecture
+The notes application follows a robust architectural flow:
+  Authentication Layer: Gatekeeps app usage via Firebase Auth (Email/Password) combined with strict email verification routines.
+  Database & File Storage: Storage maps raw images via unique UUID strings on Cloud Storage, while Firestore handles JSON document modeling (`Note` data class) linking text contents with the public image URLs.
 
-  annotations: Contains the definition of the @Extract annotation.
-
-  processor: The "engine" that uses KAPT (Kotlin Annotation Processing Tool) and KotlinPoet to write the implementation classes during compilation.
-
-  app: The consumer module where the abstract logic is defined and the generated code is utilized.
-
-3.2. Weather App
-
-The solution follows the MVVM pattern:
-
-  Model: Retrofit interfaces and data classes for OpenWeatherMap API.
-
-  ViewModel: Handles the UI State, using StateFlow or mutableStateOf to push updates to the UI.
-
-  View: Built with Jetpack Compose, utilizing Composables for a declarative UI approach
-  
 ---
 
 ## 4. Implementation
-4.1. Regex Processor Logic
 
-  Code Generation: Instead of manual parsing, the RegexProcessor scans for methods annotated with @Extract(regex = "...").
+4.1. Reactive State Management Logic
+  LoadingStateData: Implementation of an explicit data class paired with a `LoadingStatus` enum (`INIT`, `IN_PROGRESS`, `COMPLETED`, `CANCELED`) to track execution times accurately without hardcoding UI freezes.
+  Concurrency Control: Built-in coroutine job management using custom structured cancellation mechanisms (`setUpCancellation`) ensuring that when a parent view closes, background channels close cleanly.
 
-  Automation: Using KotlinPoet, the processor generates a DataProcessorExtractor class that overrides abstract methods, implementing the Regex().find() logic automatically.
+4.2. Android LLM Image Processing & Sentiment Analysis
+  Multimodal Prompting: Leveraged the Google AI Client SDK to send user-defined text strings together with Android `Bitmap`/`Uri` objects simultaneously to the Gemini API.
+  Structured Sentiment Analysis: Configured specific system prompts prompting the LLM to analyze text and mandatorily respond using a strict 7-point scale encapsulated inside a predefined JSON layout containing the fields `rating` and `justification`.
 
-  Compile-time Safety: Errors in regex or structure are caught during the build phase, not at runtime.
+4.3. Notes App Enhancements (Images & GOAT)
+  Firebase Storage Integration: Created a secure runtime pipeline within `NoteDetailsActivity` using `registerForActivityResult(GetContent())` to capture gallery items, stream them to Firebase Storage via `putFile()`, and resolve public `downloadUrl` addresses.
+  GOAT Feature (Greatest Of All Time): Implemented an advanced operational tool within the notes system (e.g., an automated "AI Summary/Action-Items" or custom image overlay tagger) designed to significantly elevate the user experience beyond a standard text editor.
 
-4.2. Weather App (Compose)
-
-  Networking: Integration with Retrofit and OkHttp to fetch real-time JSON data.
-
-  State Management: Implementation of loading, success, and error states to ensure a robust User Experience.
-
-  Formatting: Handling string formatting and URL encoding for API queries (e.g., handling spaces in city names).
 ---
 
 ## 5. Testing and Validation
-Annotation Reflection: Verified that the generated class DataProcessorExtractor correctly inherits from the base abstract class and implements the primary constructor.
+  StateFlow & Loading Verification: Validated that loading spinners and execution time counters behave reactively when simulated under slow network throttling or cancellations.
+  multimodal AI Assertions: Tested the Gemini multimodal engine with various photo samples (cakes, cookies, and local device pictures), ensuring accurate code responses, structured recipe extractions, or context explanations.
+  Firebase Persistence: Confirmed that adding, editing, or deleting entries in `NoteDetailsActivity` triggers successful synchronization alerts and propagates image links instantly into the remote Cloud Firestore dashboard.
 
-Regex Accuracy: Tested the extraction logic with inputs like "Name : John Address : 123 Street", ensuring group values are correctly captured.
-
-API Resilience: Validated the weather app's behavior when faced with network instability or incorrect city queries.
 ---
 
 ## 6. Usage Instructions
-API Keys: Obtain keys from the Weather API and Image API and add them to the project (e.g., in gradle.properties or a config file).
-
-Environment: Open the project in Android Studio (Ladybug or newer).
-
-AntiGravity: To review the MIP-2 process, check the docs/ folder and the prompt logs.
+  API Keys Config: Generate a valid Google AI Studio token and include it securely as `apiKey=AIzaSy...` at the very end of your local `local.properties` file.
+  Firebase Config: Place your project's tailored `google-services.json` credentials file inside the `/app` root directory.
+  Environment: Open the multi-module project via Android Studio (Ladybug / Koala or newer) and sync dependencies through the Gradle build engine.
 
 ---
 # Autonomous Software Engineering Sections - only for [AC OK, AI OK] sections
 ## 7. Prompting Strategy
-For the advanced sections, I employed a "Modular Architecture First" strategy.
+For the cloud synchronization and AI integration stages, I employed a "Security & Failure-Handling First" strategy.
+  Methodology: I used the AI assistant to troubleshoot silent execution hangs on Firestore connections, mapping specific success and failure listeners (`addOnSuccessListener`/`addOnFailureListener`) to isolate layout mapping issues from backend database initialization bugs.
+  Collaboration: The AI acted as an optimization consultant to safely refactor old Java-style setters/getters in the shared `Note` data architecture to support new Kotlin-based image string extensions.
 
-  Methodology: I used AI to troubleshoot the Gradle multi-module synchronization, ensuring that the kapt dependencies were correctly mapped between the :processor and :app modules.
-
-  Collaboration: The AI acted as a senior consultant for KotlinPoet syntax, helping to define the TypeSpec and FunSpec structures needed for valid code generation
 ---
 
 ## 8. Autonomous Agent Workflow
-The AntiGravity agent acted as a Junior Developer under my supervision:
+The automated assistant operated as a dedicated implementation partner under my close supervision:
+  Analysis: It analyzed the asynchronous flow requirements of the Gemini Starter templates.
+  Drafting: It laid out the necessary permissions, asynchronous contracts, and layout configurations needed to run the image upload flows safely.
+  Execution: Once approved, it helped draft clean activity code blocks, reducing structural errors and ensuring compatibility with recommended Android lifecycle APIs.
 
-  Analysis: It parsed the requirements for the Image API.
-
-  Drafting: It proposed the Data Models and Architecture in Markdown.
-
-  Execution: Once I approved the plan, it generated the Retrofit interfaces, ViewModels, and Layouts.
-  
 ---
 
 ## 9. Verification of AI-Generated Artifacts
-Code Review: Every file generated by AntiGravity was manually reviewed to ensure it didn't use deprecated libraries.
+  Code Architecture Check: Every snippet suggested by the AI was cross-referenced to ensure that it used modern Android Jetpack lifecycle structures (such as `registerForActivityResult`) instead of deprecated legacy techniques (`onActivityResult`).
+  Memory Management Review: Ensured that all asynchronous flow collectors and Firebase task listeners were properly tied to lifecycle scopes to completely eliminate context leakage risks.
 
-Architectural Check: I verified that the AI didn't leak context into the ViewModels, maintaining a clean separation of concerns
-  
 ---
 
 ## 10. Human vs AI Contribution
-Human: Conceptual design of MIP-1, manual coding of the Weather logic, API selection, and final integration/debugging.
+  Human: 100% manual implementation of the core Kotlin Flow logic, custom layout setups, Firebase console instance configurations, Firestore collection setup, and end-to-end debugging of the platform.
+  AI: Structural layout advisory for the Gemini API onboarding, drafting complex JSON string formats for sentiment analysis prompts, and formatting technical report text.
 
-AI: Generation of boilerplate code for MIP-2, drafting of technical documentation, and optimization of the Implementation Plan
 ---
 
 ## 11. Ethical and Responsible Use
-Risk Mitigation: To avoid the risk of over-reliance, AI was strictly excluded from the logic development and coding phases of the Kotlin exercises and Android tasks. This ensured that the core learning objectives of the course were met through manual implementation.
-
-Handling Limitations: AI suggestions regarding Git repository fixes were carefully cross-referenced with official documentation to ensure that no "black-box" commands were executed without understanding their impact on the local file system.
-
-Bias and Accuracy: I recognized that AI can provide outdated or overly complex UI patterns. Consequently, every suggestion regarding the "Anti-Gravity" app's design was manually filtered and adjusted to match the specific requirements of the assignment's rubric and standard Android best practices.
-
-Transparency: This report serves as a full disclosure of AI involvement, clearly separating autonomous technical troubleshooting from the student’s original software development work.
+  Risk Mitigation: To preserve the core academic learning goals, AI tools were strictly barred from generating the baseline reactive Kotlin algorithms and Android Studio native tasks. All algorithmic flows were engineered manually.
+  Handling Limitations: AI suggestions concerning Gradle versions and Firebase BOM management were verified against official documentation, preventing "black-box" configurations from messing up local environment variables.
+  Transparency: This comprehensive report functions as an honest, direct disclosure of AI presence, drawing a strict line between automated environment troubleshooting assistance and the student's original software engineering implementation work.
 
 ---
 # Development Process
 ## 12. Version Control and Commit History
-Git was used to track progress. The history shows a clear evolution: initial environment setup, Kotlin logic implementation, Android UI design, and finally, resource optimization
+Git was actively used to checkpoint development milestones. The tree shows a clear evolution: initial Coroutines/Flows adjustments, manual Firebase boilerplate setups, integration of Storage image uploading routines, and final implementation of the AI Assistant multimodal ecrãs.
+
 ---
+
 ## 13. Difficulties and Lessons Learned
-KAPT & Gradle Sync: Managing dependencies in a multi-module project was the biggest hurdle. Understanding how the processor must be compiled before the app can see the generated classes was a key takeaway.
+  Firestore Silent Buffering: Learned that when a collection or database instance isn't explicitly initialized in the Firebase Web Console, the Android SDK buffers requests silently offline without throwing local errors, causing UI operations to freeze indefinitely.
+  Gradle Dependency Mismatches: Resolving version alignment conflicts between the Firebase Storage SDK and old Kotlin compiler plugins highlighted the importance of standardizing build environments.
+  Channel Back-Pressure: Gained practical knowledge on how Kotlin Channels stream values safely across default workers and main threads without blocking screen drawing frames.
 
-Regex Specificity: Small discrepancies in white spaces between the Regex string and the input string led to null values, highlighting the need for robust regex patterns like \\s*.
-
-Code Generation Lifecycle: Learning that generated code resides in build/generated/source/kapt and understanding how to trigger a "Rebuild" to refresh the generated artifacts.
 ---
+
 ## 14. Future Improvements
-Incremental Annotation Processing: Migrating from KAPT to KSP (Kotlin Symbol Processing). KSP is specifically designed for Kotlin, offers better performance, and has a more idiomatic API for navigating Kotlin code, which would speed up the build process.
-
-Incremental Build Support: Optimizing the RegexProcessor to support incremental compilation, ensuring that the processor only regenerates files for classes that were actually modified, rather than rebuilding the entire generated module.
-
-Advanced Regex Validation: Implementing a "Fail-Fast" mechanism where the Annotation Processor validates the syntax of the Regular Expression at compile-time. If the regex is invalid, the build would fail with a specific error message, preventing runtime PatternSyntaxException errors.
-
-Support for Multiple Matches: Expanding the @Extract logic to support returning a List<String> for cases where the regex finds multiple occurrences in the input string, rather than just the first match.
-
-Unit Testing for Generated Code: Adding a test suite that specifically targets the generated DataProcessorExtractor to ensure that the extraction logic remains consistent even after changes to the processor's engine
+  Migration to KSP: Upgrading external metadata frameworks to Kotlin Symbol Processing to speed up dependency management.
+  Caching Strategies: Implementing local offline caching via Room Database to allow the Notes application to load user assets seamlessly even when completely disconnected from the Firebase server.
+  Advanced Gemini Models: Porting text processing prompts over to `gemini-1.5-pro` to capture finer sentiment context nuances and handle highly intricate multilingual requests.
 
 ---
+
 ## 15. AI Usage Disclosure (Mandatory)
-AI Tools Used: * Gemini 3 Flash: Used via the standard interface for environment troubleshooting and report structuring.
+AI Tools Used:
+  - Gemini 3 Flash: Used via standard web UI for quick environment troubleshooting and configuration file formatting.
+  - Gemini 3.1 Pro: Utilized within the IDE development module for layout optimization, intent data passing advice, and structural report adjustments.
 
-  -Gemini 3.1 Pro: Utilized specifically within the "Anti-Gravity" development environment for advanced UI design consultation and layout optimization.
+Scope of Usage:
+  - Technical Troubleshooting: Isolating Gradle sync failures, resolving missing references for Picasso/Firebase, and setting up clean local property keys.
+  - Architecture Refinement: Refactoring model bindings between Java entities and modern Kotlin Activities.
 
-Scope of Usage: * Technical Troubleshooting: Solving Git root directory mapping errors and IDE configuration issues in IntelliJ IDEA.
-
-  -UI/UX Refinement: Providing conceptual advice for the "Anti-Gravity" fuel app's layout, specifically for responsive design and resource qualifiers.
-
-  -Documentation Support: Assistance in translating, formatting, and professionalizing the English technical report.
-
-Confirmation of Responsibility: I confirm that no AI was used to generate the core logic or code for the Kotlin and Android Studio exercises, which were developed 100% manually. I have reviewed and verified all technical suggestions provided by the AI tools and remain solely responsible for the final artifacts and content of this assignment.
+Confirmation of Responsibility: I explicitly confirm that no AI tool was used to author the core logic of the Kotlin streams or Android Studio exercises, which were manually engineered 100% by me. I have validated every single artifact and remain entirely responsible for the code, behavior, and final contents of this assignment.
