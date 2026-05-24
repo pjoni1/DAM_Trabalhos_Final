@@ -40,6 +40,24 @@ class AIAssistantOpenAI(override val properties: Properties) : AIAssistant {
      * @param prompt The user's input query or prompt that needs to be formatted into a request
      */
     override fun buildRequest(prompt: String): Request {
+        val instruction = """
+            You are a sentiment analysis assistant. Your sole task is to evaluate the sentiment of the user's input text using a strict 7-point scale:
+            1. Very Negative
+            2. Negative
+            3. Slightly Negative
+            4. Neutral
+            5. Slightly Positive
+            6. Positive
+            7. Very Positive
+            
+            You MUST respond ONLY with a valid JSON object. Do not include any introductory or concluding text, no markdown formatting (like ```json), just the raw JSON.
+            The JSON format must be exactly:
+            {
+              "rating": [the integer number from 1 to 7],
+              "justification": "[a brief text explaining why]"
+            }
+        """.trimIndent()
+
         // Create the message array with system instructions and user content
         // This follows OpenAI's expected format for chat completions
         val messagesArray = JSONArray()
@@ -47,7 +65,7 @@ class AIAssistantOpenAI(override val properties: Properties) : AIAssistant {
                 // System message sets the behavior and personality of the assistant
                 JSONObject()
                     .put("role", "system")
-                    .put("content", "You are a friendly and helpful assistant.")
+                    .put("content", instruction)
             )
             .put(
                 // User message contains the actual query from the user
@@ -94,7 +112,6 @@ class AIAssistantOpenAI(override val properties: Properties) : AIAssistant {
                 val json = JSONObject(responseBody)
                 logger.debug("Raw API response: {}", responseBody)
 
-                // Validação do formato OpenAI/Groq (procura "choices" em vez de "candidates")
                 if (!json.has("choices") || json.getJSONArray("choices").length() == 0) {
                     return "Error: No choices found in the API response"
                 }
