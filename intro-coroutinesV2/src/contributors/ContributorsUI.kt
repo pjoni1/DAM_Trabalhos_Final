@@ -1,9 +1,12 @@
 package contributors
 
+import contributors.Contributors.LoadingStatus.* // Garante acesso direto aos enums (COMPLETED, CANCELED, etc.)
+import contributors.Contributors.LoadingStateData // IMPORTANTE: Resolve o erro 'Unresolved reference LoadingStateData'
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch // IMPORTANTE: Permite usar o construtor 'launch' para recolher o Flow
 import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -62,6 +65,27 @@ class ContributorsUI : JFrame("GitHub Contributors"), Contributors {
         }
         // Initialize actions
         init()
+    }
+
+    override fun updateLoadingStatus(newStatus: LoadingStateData) {
+        _loadingState.value = newStatus
+    }
+
+    override fun observeLoadingStatus() {
+        launch {
+            loadingState.collect { status ->
+                // Format the status text based on the current state
+                val text = "Loading status: " + when (status.status) {
+                    COMPLETED -> "completed in ${status.elapsedTime}"
+                    IN_PROGRESS -> "in progress ${status.elapsedTime}"
+                    CANCELED -> "canceled"
+                    INIT -> "init"
+                }
+                // Update the UI components
+                loadingStatus.text = text
+                loadingStatus.icon = if (status.status == IN_PROGRESS) loadingIcon else null
+            }
+        }
     }
 
     override fun getSelectedVariant(): Variant = variant.getItemAt(variant.selectedIndex)
@@ -158,3 +182,4 @@ fun setDefaultFontSize(size: Float) {
         }
     }
 }
+

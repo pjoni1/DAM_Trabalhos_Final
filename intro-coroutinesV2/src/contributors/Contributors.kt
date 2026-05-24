@@ -58,38 +58,38 @@ interface Contributors: CoroutineScope {
         when (getSelectedVariant()) {
             BLOCKING -> { // Blocking UI thread
                 val users = loadContributorsBlocking(service, req)
-                updateResults(users, startTime)
+                updateResults(users, startTime,completed = true)
             }
             BACKGROUND -> { // Blocking a background thread
                 loadContributorsBackground(service, req) { users ->
                     SwingUtilities.invokeLater {
-                        updateResults(users, startTime)
+                        updateResults(users, startTime,completed = true)
                     }
                 }
             }
             CALLBACKS -> { // Using callbacks
                 loadContributorsCallbacks(service, req) { users ->
                     SwingUtilities.invokeLater {
-                        updateResults(users, startTime)
+                        updateResults(users, startTime,completed = true)
                     }
                 }
             }
             SUSPEND -> { // Using coroutines
                 launch {
                     val users = loadContributorsSuspend(service, req)
-                    updateResults(users, startTime)
+                    updateResults(users, startTime,completed = true)
                 }.setUpCancellation()
             }
             CONCURRENT -> { // Performing requests concurrently
                 launch {
                     val users = loadContributorsConcurrent(service, req)
-                    updateResults(users, startTime)
+                    updateResults(users, startTime,completed = true)
                 }.setUpCancellation()
             }
             NOT_CANCELLABLE -> { // Performing requests in a non-cancellable way
                 launch {
                     val users = loadContributorsNotCancellable(service, req)
-                    updateResults(users, startTime)
+                    updateResults(users, startTime,completed = true)
                 }.setUpCancellation()
             }
             PROGRESS -> { // Showing progress
@@ -124,17 +124,22 @@ interface Contributors: CoroutineScope {
 
     private fun clearResults() {
         updateContributors(listOf())
-        updateLoadingStatus(IN_PROGRESS)
+        updateLoadingStatus(LoadingStateData(status = LoadingStatus.IN_PROGRESS, startTime = System.currentTimeMillis()))
         setActionsStatus(newLoadingEnabled = false)
     }
 
     private fun updateResults(
         users: List<User>,
         startTime: Long,
-        completed: Boolean = true
+        completed: Boolean
     ) {
         updateContributors(users)
-        updateLoadingStatus(if (completed) COMPLETED else IN_PROGRESS, startTime)
+
+        val status = if (completed) LoadingStatus.COMPLETED else LoadingStatus.IN_PROGRESS
+        val elapsedTime = calculateElapsedTime(startTime)
+
+        updateLoadingStatus(LoadingStateData(status, startTime, elapsedTime))
+
         if (completed) {
             setActionsStatus(newLoadingEnabled = true)
         }
@@ -168,7 +173,7 @@ interface Contributors: CoroutineScope {
         // cancel the loading job if the 'cancel' button was clicked
         val listener = ActionListener {
             loadingJob.cancel()
-            updateLoadingStatus(CANCELED)
+            updateLoadingStatus(LoadingStateData(status = LoadingStatus.CANCELED))
         }
         addCancelListener(listener)
 
@@ -213,4 +218,13 @@ interface Contributors: CoroutineScope {
     fun setParams(params: Params)
 
     fun getParams(): Params
+
+    private fun calculateElapsedTime(startTime: Long): String {
+        val time = System.currentTimeMillis() - startTime
+        return "${time / 1000}.${(time % 1000) / 100} sec"
+    }
+
+    fun updateLoadingStatus(newStatus: LoadingStateData)
+
+    fun observeLoadingStatus()
 }
