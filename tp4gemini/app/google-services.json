@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "132054877841",
+    "firebase_url": "https://dam-tp4-d19dd-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "dam-tp4-d19dd",
+    "storage_bucket": "dam-tp4-d19dd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132054877841:android:c7b0ad1913f02e17cd2130",
+        "android_client_info": {
+          "package_name": "com.google.firebase.codelab.friendlychat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVSpVJI4nHn5mxLo6jvGF9XkGG4_-0ApA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132054877841:android:f69c949c6f96fa41cd2130",
+        "android_client_info": {
+          "package_name": "com.notes.notesproxmlviews"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVSpVJI4nHn5mxLo6jvGF9XkGG4_-0ApA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132054877841:android:ca978efaba2c5459cd2130",
+        "android_client_info": {
+          "package_name": "dam.a51421.tp4gemini"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVSpVJI4nHn5mxLo6jvGF9XkGG4_-0ApA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
