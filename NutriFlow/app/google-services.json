@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "958855714393",
+    "project_id": "dam-nutriflow",
+    "storage_bucket": "dam-nutriflow.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958855714393:android:0f1b47ef548ad0b010c348",
+        "android_client_info": {
+          "package_name": "dam.a51421.nutriflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLePVIKauPxIMZ4acaqoKd5B4ciC0wyXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

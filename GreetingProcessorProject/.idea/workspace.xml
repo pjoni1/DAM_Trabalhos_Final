@@ -5,53 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f2c9e96-f689-48cb-8dfc-d14882fb1f20" name="Changes" comment="first commit">
-      <change afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/res/values-en/strings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/res/values-pt/strings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/build.gradle.kts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/proguard-rules.pro" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/androidTest/java/dam/a51421/nutriflow/ExampleInstrumentedTest.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/MainActivity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/components/Scaffold.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/DashboardScreen.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/LogFoodScreen.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MainScreen.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MealPlanScreen.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/ProfileScreen.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/VaultScreen.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/theme/Color.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/theme/Theme.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/theme/Type.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/drawable/ic_launcher_background.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/drawable/ic_launcher_foreground.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-hdpi/ic_launcher.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-hdpi/ic_launcher_round.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-mdpi/ic_launcher.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-mdpi/ic_launcher_round.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xhdpi/ic_launcher.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xxhdpi/ic_launcher.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/values/colors.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/values/themes.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/xml/backup_rules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/res/xml/data_extraction_rules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/app/src/test/java/dam/a51421/nutriflow/ExampleUnitTest.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../NutriFlow/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CoroutinesTutorial" beforeDir="false" afterPath="$PROJECT_DIR$/../CoroutinesTutorial" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processor/src/main/kotlin/com/example/processor/GreetingProcessor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/processor/src/main/kotlin/com/example/processor/GreetingProcessor.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/ui/WeatherScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/ui/WeatherScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/ui/WeatherUIState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/ui/WeatherUIState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/viewmodel/WeatherViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/java/com/example/cooljetpackweatherapp/viewmodel/WeatherViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../MVVMAndroid/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../RegexProcessor/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../RegexProcessor/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../RegexProcessor/processor/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../RegexProcessor/processor/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NutriFlow/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/.idea/deploymentTargetSelector.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/DashboardScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/DashboardScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/LogFoodScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/LogFoodScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MainScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MainScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MealPlanScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MealPlanScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/ProfileScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/ProfileScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tp4gemini/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../tp4gemini/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tp4gemini/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../tp4gemini/.idea/misc.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
