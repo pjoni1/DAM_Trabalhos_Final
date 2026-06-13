@@ -25,12 +25,20 @@ import java.util.*
 @Composable
 fun MealPlanScreen(viewModel: NutriFlowViewModel) {
     val mealPlan by viewModel.currentMealPlan.collectAsState()
-    val entries by viewModel.mealEntries.collectAsState()
+    val entries by viewModel.filteredMealEntries.collectAsState()
+    val offset by viewModel.selectedDateOffset.collectAsState()
 
-    // Data de hoje formatada
-    val todayDateString = remember {
-        val sdf = SimpleDateFormat("dd 'de' MMMM, yyyy", Locale.forLanguageTag("pt-PT"))
-        sdf.format(Date())
+    val displayDate = remember(offset) {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, offset)
+        SimpleDateFormat("dd 'de' MMMM, yyyy", Locale.forLanguageTag("pt-PT")).format(cal.time)
+    }
+
+    val label = when (offset) {
+        0 -> "HOJE"
+        -1 -> "ONTEM"
+        1 -> "AMANHÃ"
+        else -> if (offset < 0) "HÁ ${-offset} DIAS" else "DAQUI A $offset DIAS"
     }
 
     LazyColumn(
@@ -54,21 +62,21 @@ fun MealPlanScreen(viewModel: NutriFlowViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = {}) { Icon(Icons.Default.ChevronLeft, null) }
+                    IconButton(onClick = { viewModel.changeDateOffset(-1) }) { Icon(Icons.Default.ChevronLeft, null) }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "HOJE", 
+                            text = label, 
                             color = MaterialTheme.colorScheme.primary, 
                             fontWeight = FontWeight.Bold, 
                             style = MaterialTheme.typography.labelSmall
                         )
                         Text(
-                            text = todayDateString, 
+                            text = displayDate, 
                             fontWeight = FontWeight.Bold, 
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
-                    IconButton(onClick = {}) { Icon(Icons.Default.ChevronRight, null) }
+                    IconButton(onClick = { viewModel.changeDateOffset(1) }) { Icon(Icons.Default.ChevronRight, null) }
                 }
             }
         }
@@ -92,17 +100,17 @@ fun MealPlanScreen(viewModel: NutriFlowViewModel) {
 
             if (breakfast.isNotEmpty()) {
                 item {
-                    MealSection("Pequeno-Almoço", "08:00 AM", breakfast, entries, viewModel)
+                    MealSection("Pequeno-Almoço", "08:00 AM", breakfast, entries, viewModel, offset)
                 }
             }
             if (lunch.isNotEmpty()) {
                 item {
-                    MealSection("Almoço", "12:30 PM", lunch, entries, viewModel)
+                    MealSection("Almoço", "12:30 PM", lunch, entries, viewModel, offset)
                 }
             }
             if (dinner.isNotEmpty()) {
                 item {
-                    MealSection("Jantar", "08:00 PM", dinner, entries, viewModel)
+                    MealSection("Jantar", "08:00 PM", dinner, entries, viewModel, offset)
                 }
             }
         }
@@ -117,7 +125,8 @@ fun MealSection(
     time: String, 
     foods: List<TargetFood>,
     loggedEntries: List<dam.a51421.nutriflow.data.model.MealEntry>,
-    viewModel: NutriFlowViewModel
+    viewModel: NutriFlowViewModel,
+    offset: Int
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -142,6 +151,7 @@ fun MealSection(
 
             foods.forEach { food ->
                 val isChecked = loggedEntries.any { it.foodName == food.name && it.type == "Plan Item" }
+                val isEditable = offset == 0
                 
                 Row(
                     modifier = Modifier
@@ -152,7 +162,7 @@ fun MealSection(
                             else MaterialTheme.colorScheme.background,
                             RoundedCornerShape(12.dp)
                         )
-                        .clickable {
+                        .clickable(enabled = isEditable) {
                             if (isChecked) {
                                 viewModel.removePlanFood(food)
                             } else {
@@ -165,25 +175,32 @@ fun MealSection(
                     Checkbox(
                         checked = isChecked,
                         onCheckedChange = { checked ->
-                            if (checked) {
-                                viewModel.logPlanFood(food)
-                            } else {
-                                viewModel.removePlanFood(food)
+                            if (isEditable) {
+                                if (checked) {
+                                    viewModel.logPlanFood(food)
+                                } else {
+                                    viewModel.removePlanFood(food)
+                                }
                             }
                         },
-                        colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
+                        enabled = isEditable,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.primary,
+                            disabledCheckedColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            disabledUncheckedColor = Color.Gray.copy(alpha = 0.5f)
+                        )
                     )
                     Spacer(Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = food.name, 
                             fontWeight = FontWeight.SemiBold,
-                            color = if (isChecked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            color = if (!isEditable) Color.Gray else if (isChecked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "${food.calories} kcal | P: ${food.protein}g | H: ${food.carbs}g | G: ${food.fats}g",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
+                            color = if (!isEditable) Color.Gray.copy(alpha = 0.6f) else Color.Gray
                         )
                     }
                 }

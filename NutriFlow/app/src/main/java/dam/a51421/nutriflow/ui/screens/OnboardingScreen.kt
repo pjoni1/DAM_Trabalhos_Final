@@ -27,6 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,7 +41,7 @@ fun OnboardingScreen(
     
     // Form States
     var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
+    var dateOfBirth by remember { mutableStateOf<Long?>(null) }
     var weight by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("Male") }
@@ -121,8 +124,8 @@ fun OnboardingScreen(
                         2 -> StepGenderAndAge(
                             gender = gender,
                             onGenderChange = { gender = it },
-                            age = age,
-                            onAgeChange = { age = it }
+                            dateOfBirth = dateOfBirth,
+                            onDateChange = { dateOfBirth = it }
                         )
                         3 -> StepBiometrics(
                             weight = weight,
@@ -187,9 +190,8 @@ fun OnboardingScreen(
                                 }
                             }
                             2 -> {
-                                val ageVal = age.toIntOrNull()
-                                if (ageVal == null || ageVal <= 0) {
-                                    errorMessage = "Por favor, introduz uma idade válida."
+                                if (dateOfBirth == null) {
+                                    errorMessage = "Por favor, escolhe a tua data de nascimento."
                                 } else {
                                     errorMessage = null
                                     step++
@@ -208,13 +210,13 @@ fun OnboardingScreen(
                                 }
                             }
                             4 -> {
-                                val ageVal = age.toInt()
+                                val dobVal = dateOfBirth!!
                                 val weightVal = weight.toDouble()
                                 val heightVal = height.toDouble()
                                 
                                 viewModel.createProfile(
                                     name = name,
-                                    age = ageVal,
+                                    dateOfBirth = dobVal,
                                     weight = weightVal,
                                     height = heightVal,
                                     gender = gender,
@@ -299,12 +301,13 @@ fun StepWelcomeAndName(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StepGenderAndAge(
     gender: String,
     onGenderChange: (String) -> Unit,
-    age: String,
-    onAgeChange: (String) -> Unit
+    dateOfBirth: Long?,
+    onDateChange: (Long?) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -398,17 +401,63 @@ fun StepGenderAndAge(
 
         Spacer(Modifier.height(24.dp))
 
-        OutlinedTextField(
-            value = age,
-            onValueChange = onAgeChange,
-            label = { Text("Idade (anos)") },
-            placeholder = { Text("ex: 25") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) }
-        )
+        var showDatePicker by remember { mutableStateOf(false) }
+        val datePickerState = rememberDatePickerState()
+
+        val formattedDate = remember(dateOfBirth) {
+            if (dateOfBirth != null) {
+                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(dateOfBirth))
+            } else {
+                ""
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showDatePicker = true }
+        ) {
+            OutlinedTextField(
+                value = formattedDate,
+                onValueChange = { },
+                label = { Text("Data de Nascimento") },
+                placeholder = { Text("Selecionar data") },
+                enabled = false,
+                readOnly = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) }
+            )
+        }
+
+        if (showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onDateChange(datePickerState.selectedDateMillis)
+                        showDatePicker = false
+                    }) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text("Cancelar")
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
+        }
     }
 }
 

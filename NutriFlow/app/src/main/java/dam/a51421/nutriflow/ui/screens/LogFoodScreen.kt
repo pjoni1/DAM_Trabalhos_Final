@@ -35,15 +35,13 @@ fun LogFoodScreen(
     var quantity by remember { mutableStateOf("") }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    // Alimentos sugestivos rápidos
-    val suggestions = listOf(
-        QuickFood("Maçã", 52, 0, 14, 0, 100.0),
-        QuickFood("Banana", 89, 1, 23, 0, 100.0),
-        QuickFood("Peito de Frango", 165, 31, 0, 3, 100.0),
-        QuickFood("Arroz Branco", 130, 2, 28, 0, 100.0),
-        QuickFood("Iogurte Grego", 59, 10, 3, 0, 100.0)
-    )
+    
+    var searchQuery by remember { mutableStateOf("") }
+    val searchResults by viewModel.foodSearchResults.collectAsState()
+    
+    LaunchedEffect(Unit) {
+        viewModel.seedFoodDatabase()
+    }
 
     Scaffold(
         topBar = {
@@ -64,64 +62,85 @@ fun LogFoodScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Caixa de Pesquisa rápida (Simulada)
+            // Caixa de Pesquisa e Autocomplete
             item {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    enabled = false, // Simulada por agora
-                    modifier = Modifier.fillMaxWidth().clickable {
-                        // Implementaremos o OpenFoodFacts/Barcode scanner na Fase 4!
+                    value = searchQuery,
+                    onValueChange = { 
+                        searchQuery = it
+                        viewModel.searchFoods(it)
                     },
+                    modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Pesquisar na base de dados...") },
                     leadingIcon = { Icon(Icons.Default.Search, null) },
-                    trailingIcon = { Icon(Icons.Default.QrCodeScanner, null, tint = MaterialTheme.colorScheme.primary) },
+                    trailingIcon = { 
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { 
+                                searchQuery = ""
+                                viewModel.searchFoods("") 
+                            }) {
+                                Icon(Icons.Default.Clear, contentDescription = "Limpar pesquisa")
+                            }
+                        }
+                    },
                     shape = RoundedCornerShape(24.dp)
                 )
-            }
 
-            // Atalhos rápidos
-            item {
-                Text("Sugestões Rápidas (Toque para preencher)", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    suggestions.take(3).forEach { food ->
-                        SuggestionChip(
-                            onClick = {
-                                foodName = food.name
-                                calories = food.calories.toString()
-                                protein = food.protein.toString()
-                                carbs = food.carbs.toString()
-                                fats = food.fats.toString()
-                                quantity = food.defaultQuantity.toInt().toString()
-                            },
-                            label = { Text(food.name) },
-                            icon = { Icon(Icons.Default.Whatshot, null, Modifier.size(16.dp)) }
-                        )
+                if (searchResults.isNotEmpty() && searchQuery.isNotEmpty()) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column {
+                            searchResults.forEach { food ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            foodName = food.name
+                                            calories = food.calories.toString()
+                                            protein = food.protein.toString()
+                                            carbs = food.carbs.toString()
+                                            fats = food.fats.toString()
+                                            quantity = food.defaultQuantity.toInt().toString()
+                                            
+                                            searchQuery = ""
+                                            viewModel.searchFoods("")
+                                        }
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Default.Restaurant, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                    Spacer(Modifier.width(12.dp))
+                                    Column {
+                                        Text(food.name, fontWeight = FontWeight.SemiBold)
+                                        Text("${food.calories} kcal | ${food.defaultQuantity.toInt()}g", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                                    }
+                                }
+                                Divider(color = Color.LightGray.copy(alpha = 0.3f))
+                            }
+                        }
                     }
                 }
-                Spacer(Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+            }
+
+            // Botão de Pesquisa com Câmara
+            item {
+                Button(
+                    onClick = { /* Implementação futura com API de Visão */ },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    suggestions.drop(3).forEach { food ->
-                        SuggestionChip(
-                            onClick = {
-                                foodName = food.name
-                                calories = food.calories.toString()
-                                protein = food.protein.toString()
-                                carbs = food.carbs.toString()
-                                fats = food.fats.toString()
-                                quantity = food.defaultQuantity.toInt().toString()
-                            },
-                            label = { Text(food.name) },
-                            icon = { Icon(Icons.Default.Whatshot, null, Modifier.size(16.dp)) }
-                        )
-                    }
+                    Icon(Icons.Default.CameraAlt, contentDescription = "Câmara")
+                    Spacer(Modifier.width(8.dp))
+                    Text("Pesquisar com Câmara", fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -255,12 +274,3 @@ fun LogFoodScreen(
         }
     }
 }
-
-data class QuickFood(
-    val name: String,
-    val calories: Int,
-    val protein: Int,
-    val carbs: Int,
-    val fats: Int,
-    val defaultQuantity: Double
-)

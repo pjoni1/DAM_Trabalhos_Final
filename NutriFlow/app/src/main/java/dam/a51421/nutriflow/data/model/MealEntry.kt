@@ -11,3 +11,4 @@ data class MealEntry(
     val timestamp: Long = System.currentTimeMillis(),
     val type: String // "Free Entry" or "Plan Item"
 )
+                  

@@ -5,19 +5,36 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import android.content.Intent
 import android.net.Uri
+import com.google.firebase.firestore.FirebaseFirestore
 import dam.a51421.nutriflow.data.model.MealEntry
 import dam.a51421.nutriflow.data.model.MealPlan
 import dam.a51421.nutriflow.data.model.MediaEntry
 import dam.a51421.nutriflow.data.model.TargetFood
 import dam.a51421.nutriflow.data.model.UserProfile
+import dam.a51421.nutriflow.data.model.DatabaseFood
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
+import androidx.lifecycle.viewModelScope
 import java.util.UUID
 
 class NutriFlowViewModel(application: Application) : AndroidViewModel(application) {
 
     private val sharedPreferences = application.getSharedPreferences("NutriFlowPrefs", Context.MODE_PRIVATE)
+    private val db = FirebaseFirestore.getInstance()
+
+    // Auth State
+    private val _isUserAuthenticated = MutableStateFlow(sharedPreferences.getString("auth_username", null) != null)
+    val isUserAuthenticated: StateFlow<Boolean> = _isUserAuthenticated.asStateFlow()
+
+    private val _isAuthLoading = MutableStateFlow(false)
+    val isAuthLoading: StateFlow<Boolean> = _isAuthLoading.asStateFlow()
+
+    private val _authError = MutableStateFlow<String?>(null)
+    val authError: StateFlow<String?> = _authError.asStateFlow()
 
     // Perfil do Utilizador
     private val _userProfile = MutableStateFlow<UserProfile?>(null)
@@ -31,6 +48,37 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
     private val _currentMealPlan = MutableStateFlow<MealPlan?>(null)
     val currentMealPlan: StateFlow<MealPlan?> = _currentMealPlan.asStateFlow()
 
+    private val _selectedDateOffset = MutableStateFlow(0)
+    val selectedDateOffset: StateFlow<Int> = _selectedDateOffset.asStateFlow()
+
+    private fun getStartOfDayMillis(offset: Int): Long {
+        val calendar = java.util.Calendar.getInstance()
+        calendar.add(java.util.Calendar.DAY_OF_YEAR, offset)
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+        calendar.set(java.util.Calendar.MINUTE, 0)
+        calendar.set(java.util.Calendar.SECOND, 0)
+        calendar.set(java.util.Calendar.MILLISECOND, 0)
+        return calendar.timeInMillis
+    }
+
+    val filteredMealEntries: StateFlow<List<MealEntry>> = combine(
+        _mealEntries, _selectedDateOffset
+    ) { entries, offset ->
+        val startOfDay = getStartOfDayMillis(offset)
+        val endOfDay = startOfDay + 86400000L
+        entries.filter { it.timestamp in startOfDay until endOfDay }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    fun changeDateOffset(delta: Int) {
+        val newOffset = (_selectedDateOffset.value + delta).coerceIn(-3, 3)
+        _selectedDateOffset.value = newOffset
+        loadDefaultMealPlan()
+    }
+
     // Registos de Fotos/Media no Vault
     private val _mediaEntries = MutableStateFlow<List<MediaEntry>>(emptyList())
     val mediaEntries: StateFlow<List<MediaEntry>> = _mediaEntries.asStateFlow()
@@ -39,13 +87,37 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         loadProfileFromPreferences()
         loadDefaultMealPlan()
         loadMediaFromPreferences()
+        
+        // Se estiver logado, garante que trazemos tudo da Cloud
+        val uid = sharedPreferences.getString("id", null)
+        if (_isUserAuthenticated.value && uid != null) {
+            loadProfileFromFirestore(uid)
+        }
+    }
+
+    fun calculateAge(dobMillis: Long): Int {
+        val dob = java.util.Calendar.getInstance().apply { timeInMillis = dobMillis }
+        val today = java.util.Calendar.getInstance()
+        var calculatedAge = today.get(java.util.Calendar.YEAR) - dob.get(java.util.Calendar.YEAR)
+        if (today.get(java.util.Calendar.DAY_OF_YEAR) < dob.get(java.util.Calendar.DAY_OF_YEAR)) {
+            calculatedAge--
+        }
+        return calculatedAge
     }
 
     // Carregar Perfil Guardado
     private fun loadProfileFromPreferences() {
         val name = sharedPreferences.getString("name", null)
         if (name != null) {
+            var id = sharedPreferences.getString("id", null)
+            if (id == null) {
+                id = UUID.randomUUID().toString()
+                sharedPreferences.edit().putString("id", id).apply()
+            }
             val age = sharedPreferences.getInt("age", 25)
+            val dob = sharedPreferences.getLong("dateOfBirth", -1L)
+            val dateOfBirth = if (dob != -1L) dob else null
+            val profilePictureUri = sharedPreferences.getString("profilePictureUri", null)
             val weight = sharedPreferences.getFloat("weight", 70f).toDouble()
             val height = sharedPreferences.getFloat("height", 170f).toDouble()
             val gender = sharedPreferences.getString("gender", "Male") ?: "Male"
@@ -57,6 +129,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             val streak = sharedPreferences.getInt("streak", 0)
 
             _userProfile.value = UserProfile(
+                id = id,
                 name = name,
                 age = age,
                 weight = weight,
@@ -67,13 +140,19 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                 dailyProteinGoal = proteinGoal,
                 dailyCarbsGoal = carbsGoal,
                 dailyFatsGoal = fatsGoal,
-                streakCount = streak
+                streakCount = streak,
+                dateOfBirth = dateOfBirth,
+                profilePictureUri = profilePictureUri
             )
         }
     }
 
     // Criar e Calcular Perfil (Onboarding)
-    fun createProfile(name: String, age: Int, weight: Double, height: Double, gender: String, goal: String) {
+    fun createProfile(name: String, dateOfBirth: Long, weight: Double, height: Double, gender: String, goal: String) {
+        val age = calculateAge(dateOfBirth)
+        // Obter ou gerar um ID único para o perfil
+        val id = sharedPreferences.getString("id", null) ?: UUID.randomUUID().toString()
+
         // Mifflin-St Jeor Formula para TMB
         val bmr = if (gender == "Male") {
             (10 * weight) + (6.25 * height) - (5 * age) + 5
@@ -103,6 +182,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         val carbsGoal = (remainingCalories / 4).toInt().coerceAtLeast(50)
 
         val profile = UserProfile(
+            id = id,
             name = name,
             age = age,
             weight = weight,
@@ -113,13 +193,17 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             dailyProteinGoal = proteinGoal,
             dailyCarbsGoal = carbsGoal,
             dailyFatsGoal = fatsGoal,
-            streakCount = 0
+            streakCount = 0,
+            dateOfBirth = dateOfBirth,
+            profilePictureUri = _userProfile.value?.profilePictureUri // Keep existing if updating
         )
 
         // Guardar localmente
         sharedPreferences.edit().apply {
+            putString("id", id)
             putString("name", name)
             putInt("age", age)
+            putLong("dateOfBirth", dateOfBirth)
             putFloat("weight", weight.toFloat())
             putFloat("height", height.toFloat())
             putString("gender", gender)
@@ -133,33 +217,78 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         }
 
         _userProfile.value = profile
+        
+        // Sincronizar com Firestore
+        syncAllToFirestore()
     }
 
-    // Apagar Perfil (Reset)
+    fun updateProfilePicture(uri: String) {
+        val profile = _userProfile.value ?: return
+        val updatedProfile = profile.copy(profilePictureUri = uri)
+        _userProfile.value = updatedProfile
+        
+        sharedPreferences.edit().putString("profilePictureUri", uri).apply()
+        
+        // Save to Firestore if authenticated
+        val uid = sharedPreferences.getString("id", null)
+        if (_isUserAuthenticated.value && uid != null) {
+            db.collection("profiles").document(uid).update("profilePictureUri", uri)
+        }
+    }
+
+    // Apagar Perfil (Reset) / Encerrar Sessão
+    fun signOut() {
+        _isUserAuthenticated.value = false
+        clearProfile()
+    }
+
     fun clearProfile() {
         sharedPreferences.edit().clear().apply()
         _userProfile.value = null
         _mealEntries.value = emptyList()
+        _mediaEntries.value = emptyList()
     }
 
     // Carregar Plano Alimentar Default de Exemplo
     private fun loadDefaultMealPlan() {
-        val defaultFoods = listOf(
-            TargetFood("Overnight Oats com Chia", 320, 12, 45, 8, "08:00 AM"),
-            TargetFood("Café Negro", 5, 0, 1, 0, "08:00 AM"),
-            TargetFood("Salada de Frango Grelhado", 450, 40, 15, 22, "12:30 PM"),
-            TargetFood("Porção de Quinoa", 110, 4, 20, 2, "12:30 PM"),
-            TargetFood("Salmão com Brócolos cozidos", 520, 42, 10, 28, "08:00 PM")
-        )
+        val offset = _selectedDateOffset.value
+        val planType = Math.abs(offset) % 3
+
+        val defaultFoods = when (planType) {
+            1 -> listOf(
+                TargetFood("Ovos Mexidos com Pão Integral", 350, 20, 30, 15, "08:00 AM"),
+                TargetFood("Chá Verde", 0, 0, 0, 0, "08:00 AM"),
+                TargetFood("Bife de Peru com Arroz", 480, 45, 40, 10, "12:30 PM"),
+                TargetFood("Maçã", 95, 0, 25, 0, "12:30 PM"),
+                TargetFood("Sopa de Legumes e Pescada", 320, 30, 20, 5, "08:00 PM")
+            )
+            2 -> listOf(
+                TargetFood("Batido de Proteína e Banana", 280, 25, 35, 5, "08:00 AM"),
+                TargetFood("Massa Integral com Atum", 550, 35, 60, 15, "12:30 PM"),
+                TargetFood("Salada Mista", 50, 2, 10, 0, "12:30 PM"),
+                TargetFood("Omelete de Claras com Espinafres", 250, 30, 5, 10, "08:00 PM")
+            )
+            else -> listOf( // Original (Type 0)
+                TargetFood("Overnight Oats com Chia", 320, 12, 45, 8, "08:00 AM"),
+                TargetFood("Café Negro", 5, 0, 1, 0, "08:00 AM"),
+                TargetFood("Salada de Frango Grelhado", 450, 40, 15, 22, "12:30 PM"),
+                TargetFood("Porção de Quinoa", 110, 4, 20, 2, "12:30 PM"),
+                TargetFood("Salmão com Brócolos cozidos", 520, 42, 10, 28, "08:00 PM")
+            )
+        }
+
         _currentMealPlan.value = MealPlan(
-            id = "default_plan",
-            dayOfWeek = 1, // Exemplo: Segunda-feira
+            id = "plan_offset_$offset",
+            dayOfWeek = (offset % 7 + 7) % 7 + 1,
             targetFoods = defaultFoods
         )
     }
 
     // Adicionar Refeição ao Registo Livre
     fun logManualFood(name: String, calories: Int, protein: Int, carbs: Int, fats: Int, quantity: Double) {
+        val offset = _selectedDateOffset.value
+        val entryTimestamp = if (offset == 0) System.currentTimeMillis() else getStartOfDayMillis(offset) + 43200000L
+
         val newEntry = MealEntry(
             id = UUID.randomUUID().toString(),
             foodName = name,
@@ -168,17 +297,44 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             carbs = carbs,
             fats = fats,
             quantity = quantity,
+            timestamp = entryTimestamp,
             type = "Free Entry"
         )
         _mealEntries.value = _mealEntries.value + newEntry
         checkAndIncrementStreak()
+
+        // Sincronizar com o Firestore
+        val profile = _userProfile.value
+        if (profile != null) {
+            val entryData = hashMapOf(
+                "foodName" to newEntry.foodName,
+                "calories" to newEntry.calories,
+                "protein" to newEntry.protein,
+                "carbs" to newEntry.carbs,
+                "fats" to newEntry.fats,
+                "quantity" to newEntry.quantity,
+                "timestamp" to newEntry.timestamp,
+                "type" to newEntry.type
+            )
+            db.collection("profiles").document(profile.id).collection("mealEntries").document(newEntry.id)
+                .set(entryData)
+        }
     }
 
     // Registar/Marcar Alimento do Plano (Checklist)
     fun logPlanFood(targetFood: TargetFood) {
-        // Verificar se já está registado hoje para evitar duplicados
-        val alreadyLogged = _mealEntries.value.any { it.foodName == targetFood.name && it.type == "Plan Item" }
+        val startOfDay = getStartOfDayMillis(_selectedDateOffset.value)
+        val endOfDay = startOfDay + 86400000L
+        val alreadyLogged = _mealEntries.value.any { 
+            it.foodName == targetFood.name && 
+            it.type == "Plan Item" && 
+            it.timestamp in startOfDay until endOfDay
+        }
+        
         if (!alreadyLogged) {
+            val offset = _selectedDateOffset.value
+            val entryTimestamp = if (offset == 0) System.currentTimeMillis() else getStartOfDayMillis(offset) + 43200000L
+
             val newEntry = MealEntry(
                 id = UUID.randomUUID().toString(),
                 foodName = targetFood.name,
@@ -187,20 +343,58 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                 carbs = targetFood.carbs,
                 fats = targetFood.fats,
                 quantity = 1.0,
+                timestamp = entryTimestamp,
                 type = "Plan Item"
             )
             _mealEntries.value = _mealEntries.value + newEntry
             checkAndIncrementStreak()
+
+            // Sincronizar com o Firestore
+            val profile = _userProfile.value
+            if (profile != null) {
+                val entryData = hashMapOf(
+                    "foodName" to newEntry.foodName,
+                    "calories" to newEntry.calories,
+                    "protein" to newEntry.protein,
+                    "carbs" to newEntry.carbs,
+                    "fats" to newEntry.fats,
+                    "quantity" to newEntry.quantity,
+                    "timestamp" to newEntry.timestamp,
+                    "type" to newEntry.type
+                )
+                db.collection("profiles").document(profile.id).collection("mealEntries").document(newEntry.id)
+                    .set(entryData)
+            }
         }
     }
 
     // Desmarcar/Remover Alimento do Plano
     fun removePlanFood(targetFood: TargetFood) {
-        _mealEntries.value = _mealEntries.value.filterNot { it.foodName == targetFood.name && it.type == "Plan Item" }
+        val startOfDay = getStartOfDayMillis(_selectedDateOffset.value)
+        val endOfDay = startOfDay + 86400000L
+
+        val entryToRemove = _mealEntries.value.find { 
+            it.foodName == targetFood.name && 
+            it.type == "Plan Item" &&
+            it.timestamp in startOfDay until endOfDay
+        }
+
+        if (entryToRemove != null) {
+            _mealEntries.value = _mealEntries.value.filter { it.id != entryToRemove.id }
+            
+            val profile = _userProfile.value
+            if (profile != null) {
+                db.collection("profiles").document(profile.id).collection("mealEntries").document(entryToRemove.id).delete()
+            }
+        }
     }
 
     // Remover qualquer registo
     fun removeMealEntry(entryId: String) {
+        val profile = _userProfile.value
+        if (profile != null) {
+            db.collection("profiles").document(profile.id).collection("mealEntries").document(entryId).delete()
+        }
         _mealEntries.value = _mealEntries.value.filterNot { it.id == entryId }
     }
 
@@ -222,6 +416,10 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                 val newStreak = profile.streakCount + 1
                 sharedPreferences.edit().putInt("streak", newStreak).putLong("lastActive", System.currentTimeMillis()).apply()
                 _userProfile.value = profile.copy(streakCount = newStreak)
+
+                // Atualizar no Firestore
+                db.collection("profiles").document(profile.id)
+                    .update(mapOf("streakCount" to newStreak, "lastActiveTimestamp" to System.currentTimeMillis()))
             }
         }
     }
@@ -269,6 +467,19 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         val newList = _mediaEntries.value + newEntry
         _mediaEntries.value = newList
         saveMediaToPreferences(newList)
+
+        // Sincronizar com o Firestore
+        val profile = _userProfile.value
+        if (profile != null) {
+            val mediaData = hashMapOf(
+                "filePath" to newEntry.filePath,
+                "storageUrl" to newEntry.storageUrl,
+                "category" to newEntry.category,
+                "date" to newEntry.date
+            )
+            db.collection("profiles").document(profile.id).collection("vault").document(newEntry.id)
+                .set(mediaData)
+        }
     }
 
     // Remover foto do Vault
@@ -276,5 +487,347 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         val newList = _mediaEntries.value.filterNot { it.id == id }
         _mediaEntries.value = newList
         saveMediaToPreferences(newList)
+
+        // Sincronizar com o Firestore
+        val profile = _userProfile.value
+        if (profile != null) {
+            db.collection("profiles").document(profile.id).collection("vault").document(id)
+                .delete()
+        }
+    }
+
+    // Sincronização completa de tudo com o Firestore
+    fun syncAllToFirestore() {
+        val profile = _userProfile.value ?: return
+        val profileId = profile.id
+
+        // 1. Sincronizar perfil
+        val profileData = hashMapOf(
+            "name" to profile.name,
+            "age" to profile.age,
+            "weight" to profile.weight,
+            "height" to profile.height,
+            "gender" to profile.gender,
+            "goal" to profile.goal,
+            "dailyCalorieGoal" to profile.dailyCalorieGoal,
+            "dailyProteinGoal" to profile.dailyProteinGoal,
+            "dailyCarbsGoal" to profile.dailyCarbsGoal,
+            "dailyFatsGoal" to profile.dailyFatsGoal,
+            "streakCount" to profile.streakCount,
+            "lastActiveTimestamp" to profile.lastActiveTimestamp
+        )
+        db.collection("profiles").document(profileId).set(profileData)
+
+        // 2. Sincronizar vault (fotos)
+        _mediaEntries.value.forEach { media ->
+            val mediaData = hashMapOf(
+                "filePath" to media.filePath,
+                "storageUrl" to media.storageUrl,
+                "category" to media.category,
+                "date" to media.date
+            )
+            db.collection("profiles").document(profileId).collection("vault").document(media.id).set(mediaData)
+        }
+
+        // 3. Sincronizar mealEntries (logs de comida)
+        _mealEntries.value.forEach { entry ->
+            val entryData = hashMapOf(
+                "foodName" to entry.foodName,
+                "calories" to entry.calories,
+                "protein" to entry.protein,
+                "carbs" to entry.carbs,
+                "fats" to entry.fats,
+                "quantity" to entry.quantity,
+                "timestamp" to entry.timestamp,
+                "type" to entry.type
+            )
+            db.collection("profiles").document(profileId).collection("mealEntries").document(entry.id).set(entryData)
+        }
+
+        // 4. Sincronizar plano alimentar
+        val plan = _currentMealPlan.value
+        if (plan != null) {
+            val planData = hashMapOf(
+                "dayOfWeek" to plan.dayOfWeek
+            )
+            db.collection("profiles").document(profileId).collection("mealPlan").document("activePlan").set(planData)
+
+            plan.targetFoods.forEachIndexed { index, food ->
+                val foodData = hashMapOf(
+                    "name" to food.name,
+                    "calories" to food.calories,
+                    "protein" to food.protein,
+                    "carbs" to food.carbs,
+                    "fats" to food.fats,
+                    "time" to food.time
+                )
+                db.collection("profiles").document(profileId).collection("mealPlan").document("activePlan")
+                    .collection("targetFoods").document("food_$index").set(foodData)
+            }
+        }
+    }
+
+    // --- Autenticação (Apenas Firestore) ---
+    fun signIn(username: String, pass: String) {
+        _isAuthLoading.value = true
+        _authError.value = null
+        
+        val userDoc = username.trim().lowercase()
+        db.collection("users").document(userDoc).get().addOnCompleteListener { task ->
+            _isAuthLoading.value = false
+            if (task.isSuccessful) {
+                val doc = task.result
+                if (doc != null && doc.exists()) {
+                    val savedPass = doc.getString("password")
+                    if (savedPass == pass) {
+                        val profileId = doc.getString("profileId") ?: UUID.randomUUID().toString()
+                        sharedPreferences.edit().putString("auth_username", userDoc).putString("id", profileId).apply()
+                        _isUserAuthenticated.value = true
+                        loadProfileFromFirestore(profileId)
+                    } else {
+                        _authError.value = "Palavra-passe incorreta."
+                    }
+                } else {
+                    _authError.value = "Utilizador não encontrado."
+                }
+            } else {
+                _authError.value = "Erro ao conectar à base de dados."
+            }
+        }
+    }
+
+    fun signUp(username: String, pass: String) {
+        _isAuthLoading.value = true
+        _authError.value = null
+        
+        val userDoc = username.trim().lowercase()
+        db.collection("users").document(userDoc).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val doc = task.result
+                if (doc != null && doc.exists()) {
+                    _isAuthLoading.value = false
+                    _authError.value = "Este nome de utilizador já existe."
+                } else {
+                    // Criar novo user
+                    val profileId = UUID.randomUUID().toString()
+                    val userData = hashMapOf(
+                        "username" to username.trim(),
+                        "password" to pass,
+                        "profileId" to profileId
+                    )
+                    db.collection("users").document(userDoc).set(userData).addOnCompleteListener { createTask ->
+                        _isAuthLoading.value = false
+                        if (createTask.isSuccessful) {
+                            sharedPreferences.edit().putString("auth_username", userDoc).putString("id", profileId).apply()
+                            _isUserAuthenticated.value = true
+                        } else {
+                            _authError.value = "Erro ao registar utilizador."
+                        }
+                    }
+                }
+            } else {
+                _isAuthLoading.value = false
+                _authError.value = "Erro ao conectar à base de dados."
+            }
+        }
+    }
+
+    fun clearAuthError() {
+        _authError.value = null
+    }
+
+    private fun loadProfileFromFirestore(uid: String) {
+        db.collection("profiles").document(uid).get().addOnSuccessListener { doc ->
+            if (doc.exists()) {
+                val name = doc.getString("name") ?: ""
+                val age = doc.getLong("age")?.toInt() ?: 25
+                val weight = doc.getDouble("weight") ?: 70.0
+                val height = doc.getDouble("height") ?: 170.0
+                val gender = doc.getString("gender") ?: "Male"
+                val goal = doc.getString("goal") ?: "Maintain"
+                val calorieGoal = doc.getLong("dailyCalorieGoal")?.toInt() ?: 2000
+                val proteinGoal = doc.getLong("dailyProteinGoal")?.toInt() ?: 130
+                val carbsGoal = doc.getLong("dailyCarbsGoal")?.toInt() ?: 220
+                val fatsGoal = doc.getLong("dailyFatsGoal")?.toInt() ?: 65
+                val streakCount = doc.getLong("streakCount")?.toInt() ?: 0
+                val dateOfBirth = doc.getLong("dateOfBirth")
+                val profilePictureUri = doc.getString("profilePictureUri")
+                
+                _userProfile.value = UserProfile(
+                    id = uid,
+                    name = name,
+                    age = age,
+                    weight = weight,
+                    height = height,
+                    gender = gender,
+                    goal = goal,
+                    dailyCalorieGoal = calorieGoal,
+                    dailyProteinGoal = proteinGoal,
+                    dailyCarbsGoal = carbsGoal,
+                    dailyFatsGoal = fatsGoal,
+                    streakCount = streakCount,
+                    dateOfBirth = dateOfBirth,
+                    profilePictureUri = profilePictureUri
+                )
+                
+                sharedPreferences.edit().apply {
+                    putString("id", uid)
+                    putString("name", name)
+                    putInt("age", age)
+                    if (dateOfBirth != null) putLong("dateOfBirth", dateOfBirth)
+                    if (profilePictureUri != null) putString("profilePictureUri", profilePictureUri)
+                    putFloat("weight", weight.toFloat())
+                    putFloat("height", height.toFloat())
+                    putString("gender", gender)
+                    putString("goal", goal)
+                    putInt("calorieGoal", calorieGoal)
+                    putInt("proteinGoal", proteinGoal)
+                    putInt("carbsGoal", carbsGoal)
+                    putInt("fatsGoal", fatsGoal)
+                    putInt("streak", streakCount)
+                    apply()
+                }
+
+                // 1. Carregar fotos do Vault
+                db.collection("profiles").document(uid).collection("vault").get()
+                    .addOnSuccessListener { vaultSnapshot ->
+                        val mediaList = vaultSnapshot.documents.mapNotNull { mediaDoc ->
+                            val mId = mediaDoc.id
+                            val filePath = mediaDoc.getString("filePath") ?: return@mapNotNull null
+                            val category = mediaDoc.getString("category") ?: "Outro"
+                            val date = mediaDoc.getLong("date") ?: System.currentTimeMillis()
+                            MediaEntry(id = mId, filePath = filePath, category = category, date = date)
+                        }
+                        _mediaEntries.value = mediaList
+                        saveMediaToPreferences(mediaList)
+                    }
+
+                // 2. Carregar Registos de Comida (Meal Entries)
+                db.collection("profiles").document(uid).collection("mealEntries").get()
+                    .addOnSuccessListener { entriesSnapshot ->
+                        val entriesList = entriesSnapshot.documents.mapNotNull { entryDoc ->
+                            val eId = entryDoc.id
+                            val foodName = entryDoc.getString("foodName") ?: return@mapNotNull null
+                            val calories = entryDoc.getLong("calories")?.toInt() ?: 0
+                            val protein = entryDoc.getLong("protein")?.toInt() ?: 0
+                            val carbs = entryDoc.getLong("carbs")?.toInt() ?: 0
+                            val fats = entryDoc.getLong("fats")?.toInt() ?: 0
+                            val quantity = entryDoc.getDouble("quantity") ?: 1.0
+                            val timestamp = entryDoc.getLong("timestamp") ?: System.currentTimeMillis()
+                            val type = entryDoc.getString("type") ?: "Free Entry"
+                            MealEntry(
+                                id = eId,
+                                foodName = foodName,
+                                calories = calories,
+                                protein = protein,
+                                carbs = carbs,
+                                fats = fats,
+                                quantity = quantity,
+                                timestamp = timestamp,
+                                type = type
+                            )
+                        }
+                        _mealEntries.value = entriesList
+                    }
+
+                // 3. Carregar Plano Alimentar
+                db.collection("profiles").document(uid).collection("mealPlan").document("activePlan").get()
+                    .addOnSuccessListener { planDoc ->
+                        if (planDoc.exists()) {
+                            val dayOfWeek = planDoc.getLong("dayOfWeek")?.toInt() ?: 1
+                            db.collection("profiles").document(uid).collection("mealPlan").document("activePlan")
+                                .collection("targetFoods").get()
+                                .addOnSuccessListener { foodsSnapshot ->
+                                    val targetFoodsList = foodsSnapshot.documents.mapNotNull { foodDoc ->
+                                        val fName = foodDoc.getString("name") ?: return@mapNotNull null
+                                        val fCalories = foodDoc.getLong("calories")?.toInt() ?: 0
+                                        val fProtein = foodDoc.getLong("protein")?.toInt() ?: 0
+                                        val fCarbs = foodDoc.getLong("carbs")?.toInt() ?: 0
+                                        val fFats = foodDoc.getLong("fats")?.toInt() ?: 0
+                                        val fTime = foodDoc.getString("time") ?: ""
+                                        TargetFood(fName, fCalories, fProtein, fCarbs, fFats, fTime)
+                                    }
+                                    _currentMealPlan.value = MealPlan(
+                                        id = "activePlan",
+                                        dayOfWeek = dayOfWeek,
+                                        targetFoods = targetFoodsList
+                                    )
+                                }
+                        }
+                    }
+            }
+        }
+    }
+
+    // --- PESQUISA DE ALIMENTOS (AUTOCOMPLETE) ---
+    private val _foodSearchResults = MutableStateFlow<List<DatabaseFood>>(emptyList())
+    val foodSearchResults: StateFlow<List<DatabaseFood>> = _foodSearchResults.asStateFlow()
+
+    fun searchFoods(query: String) {
+        if (query.isBlank()) {
+            _foodSearchResults.value = emptyList()
+            return
+        }
+        
+        // Simples query com base no nome (começa com)
+        val searchTerm = query.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
+        
+        db.collection("food_database")
+            .whereGreaterThanOrEqualTo("name", searchTerm)
+            .whereLessThanOrEqualTo("name", searchTerm + "\uf8ff")
+            .limit(10)
+            .get()
+            .addOnSuccessListener { documents ->
+                val results = documents.mapNotNull { doc ->
+                    try {
+                        DatabaseFood(
+                            id = doc.id,
+                            name = doc.getString("name") ?: "",
+                            calories = doc.getLong("calories")?.toInt() ?: 0,
+                            protein = doc.getLong("protein")?.toInt() ?: 0,
+                            carbs = doc.getLong("carbs")?.toInt() ?: 0,
+                            fats = doc.getLong("fats")?.toInt() ?: 0,
+                            defaultQuantity = doc.getDouble("defaultQuantity") ?: 100.0
+                        )
+                    } catch (e: Exception) { null }
+                }
+                _foodSearchResults.value = results
+            }
+            .addOnFailureListener {
+                _foodSearchResults.value = emptyList()
+            }
+    }
+
+    fun seedFoodDatabase() {
+        val initialFoods = listOf(
+            DatabaseFood(name = "Maçã", calories = 52, protein = 0, carbs = 14, fats = 0, defaultQuantity = 100.0),
+            DatabaseFood(name = "Manga", calories = 60, protein = 1, carbs = 15, fats = 0, defaultQuantity = 100.0),
+            DatabaseFood(name = "Melão", calories = 34, protein = 1, carbs = 8, fats = 0, defaultQuantity = 100.0),
+            DatabaseFood(name = "Banana", calories = 89, protein = 1, carbs = 23, fats = 0, defaultQuantity = 100.0),
+            DatabaseFood(name = "Peito de Frango", calories = 165, protein = 31, carbs = 0, fats = 3, defaultQuantity = 100.0),
+            DatabaseFood(name = "Arroz Branco", calories = 130, protein = 2, carbs = 28, fats = 0, defaultQuantity = 100.0),
+            DatabaseFood(name = "Arroz Integral", calories = 111, protein = 3, carbs = 23, fats = 1, defaultQuantity = 100.0),
+            DatabaseFood(name = "Iogurte Grego", calories = 59, protein = 10, carbs = 3, fats = 0, defaultQuantity = 100.0),
+            DatabaseFood(name = "Ovo Cozido", calories = 155, protein = 13, carbs = 1, fats = 11, defaultQuantity = 100.0),
+            DatabaseFood(name = "Atum em Água", calories = 116, protein = 26, carbs = 0, fats = 1, defaultQuantity = 100.0),
+            DatabaseFood(name = "Pão Integral", calories = 247, protein = 13, carbs = 41, fats = 3, defaultQuantity = 100.0)
+        )
+
+        db.collection("food_database").get().addOnSuccessListener { snapshot ->
+            if (snapshot.isEmpty) {
+                // Seed the database
+                initialFoods.forEach { food ->
+                    val foodData = hashMapOf(
+                        "name" to food.name,
+                        "calories" to food.calories,
+                        "protein" to food.protein,
+                        "carbs" to food.carbs,
+                        "fats" to food.fats,
+                        "defaultQuantity" to food.defaultQuantity
+                    )
+                    db.collection("food_database").add(foodData)
+                }
+            }
+        }
     }
 }

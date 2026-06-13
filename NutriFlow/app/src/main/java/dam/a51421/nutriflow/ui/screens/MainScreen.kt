@@ -17,8 +17,11 @@ import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
 fun MainScreen() {
     val viewModel: NutriFlowViewModel = viewModel()
     val userProfile by viewModel.userProfile.collectAsState()
+    val isAuthenticated by viewModel.isUserAuthenticated.collectAsState()
 
-    if (userProfile == null) {
+    if (!isAuthenticated) {
+        AuthScreen(viewModel = viewModel)
+    } else if (userProfile == null) {
         OnboardingScreen(
             viewModel = viewModel,
             onComplete = {

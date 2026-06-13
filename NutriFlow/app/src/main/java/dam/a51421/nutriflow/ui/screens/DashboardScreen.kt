@@ -22,11 +22,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun DashboardScreen(viewModel: NutriFlowViewModel) {
     val profile by viewModel.userProfile.collectAsState()
-    val entries by viewModel.mealEntries.collectAsState()
+    val entries by viewModel.filteredMealEntries.collectAsState()
+    val offset by viewModel.selectedDateOffset.collectAsState()
+
+    val displayDate = remember(offset) {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, offset)
+        SimpleDateFormat("dd 'de' MMMM, yyyy", Locale.forLanguageTag("pt-PT")).format(cal.time)
+    }
+
+    val label = when (offset) {
+        0 -> "HOJE"
+        -1 -> "ONTEM"
+        1 -> "AMANHÃ"
+        else -> if (offset < 0) "HÁ ${-offset} DIAS" else "DAQUI A $offset DIAS"
+    }
 
     // Cálculos dinâmicos
     val calorieGoal = profile?.dailyCalorieGoal ?: 2000
@@ -57,6 +74,40 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Cabeçalho de data
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(20.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { viewModel.changeDateOffset(-1) }) { Icon(Icons.Default.ChevronLeft, null) }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = label, 
+                            color = MaterialTheme.colorScheme.primary, 
+                            fontWeight = FontWeight.Bold, 
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                        Text(
+                            text = displayDate, 
+                            fontWeight = FontWeight.Bold, 
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                    IconButton(onClick = { viewModel.changeDateOffset(1) }) { Icon(Icons.Default.ChevronRight, null) }
+                }
+            }
+        }
+
         // Cartão de Streak (Estilo Duolingo)
         item {
             val streak = profile?.streakCount ?: 0
@@ -172,7 +223,7 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
         if (entries.isNotEmpty()) {
             item {
                 Spacer(Modifier.height(8.dp))
-                Text("Refeições de Hoje", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                Text("Refeições Registadas ($label)", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             }
 
             items(entries) { entry ->
@@ -222,7 +273,8 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
                     border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
                 ) {
                     Text(
-                        text = "Ainda não registaste nenhuma refeição hoje. Usa o botão 'Log Food' abaixo!",
+                        text = if (offset == 0) "Ainda não registaste nenhuma refeição hoje. Usa o botão 'Log Food' abaixo!" 
+                               else "Não há refeições registadas para $label.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                         textAlign = TextAlign.Center,

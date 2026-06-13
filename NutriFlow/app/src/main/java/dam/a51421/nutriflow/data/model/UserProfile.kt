@@ -1,6 +1,7 @@
 package dam.a51421.nutriflow.data.model
 
 data class UserProfile(
+    val id: String,
     val name: String,
     val age: Int,
     val weight: Double, // in kg
@@ -12,5 +13,7 @@ data class UserProfile(
     val dailyCarbsGoal: Int,   // in grams
     val dailyFatsGoal: Int,    // in grams
     val streakCount: Int = 0,
-    val lastActiveTimestamp: Long = System.currentTimeMillis()
+    val lastActiveTimestamp: Long = System.currentTimeMillis(),
+    val dateOfBirth: Long? = null,
+    val profilePictureUri: String? = null
 )

@@ -1,6 +1,7 @@
 package dam.a51421.nutriflow.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -18,7 +19,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,7 +35,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
     val profile by viewModel.userProfile.collectAsState()
 
     var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
+    var dateOfBirth by remember { mutableStateOf<Long?>(null) }
     var weight by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("Male") }
@@ -36,7 +45,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
     LaunchedEffect(profile) {
         profile?.let {
             name = it.name
-            age = it.age.toString()
+            dateOfBirth = it.dateOfBirth
             weight = it.weight.toString()
             height = it.height.toString()
             gender = it.gender
@@ -45,6 +54,15 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
     }
 
     var showSuccessSnackbar by remember { mutableStateOf(false) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                viewModel.updateProfilePicture(uri.toString())
+            }
+        }
+    )
 
     LazyColumn(
         modifier = Modifier
@@ -57,15 +75,28 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
             Box(
                 modifier = Modifier
                     .size(88.dp)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                    .clickable {
+                        photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    Icons.Default.Person, 
-                    null, 
-                    tint = MaterialTheme.colorScheme.primary, 
-                    modifier = Modifier.size(44.dp)
-                )
+                if (profile?.profilePictureUri != null) {
+                    AsyncImage(
+                        model = profile?.profilePictureUri,
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.Person, 
+                        null, 
+                        tint = MaterialTheme.colorScheme.primary, 
+                        modifier = Modifier.size(44.dp)
+                    )
+                }
             }
             Spacer(Modifier.height(8.dp))
             Text("Perfil Biométrico", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineSmall)
@@ -90,14 +121,61 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
                         shape = RoundedCornerShape(12.dp)
                     )
 
-                    OutlinedTextField(
-                        value = age,
-                        onValueChange = { age = it },
-                        label = { Text("Idade") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                    var showDatePicker by remember { mutableStateOf(false) }
+                    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = dateOfBirth)
+
+                    val formattedDate = remember(dateOfBirth) {
+                        if (dateOfBirth != null) {
+                            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(dateOfBirth!!))
+                        } else {
+                            ""
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showDatePicker = true }
+                    ) {
+                        OutlinedTextField(
+                            value = formattedDate,
+                            onValueChange = { },
+                            label = { Text("Data de Nascimento") },
+                            enabled = false,
+                            readOnly = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                disabledBorderColor = MaterialTheme.colorScheme.outline,
+                                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    }
+
+                    if (showDatePicker) {
+                        DatePickerDialog(
+                            onDismissRequest = { showDatePicker = false },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    dateOfBirth = datePickerState.selectedDateMillis
+                                    showDatePicker = false
+                                }) {
+                                    Text("OK")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDatePicker = false }) {
+                                    Text("Cancelar")
+                                }
+                            }
+                        ) {
+                            DatePicker(state = datePickerState)
+                        }
+                    }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -162,11 +240,10 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
         item {
             Button(
                 onClick = {
-                    val ageVal = age.toIntOrNull() ?: 0
                     val weightVal = weight.toDoubleOrNull() ?: 0.0
                     val heightVal = height.toDoubleOrNull() ?: 0.0
-                    if (name.isNotEmpty() && ageVal > 0 && weightVal > 0.0 && heightVal > 0.0) {
-                        viewModel.createProfile(name, ageVal, weightVal, heightVal, gender, goal)
+                    if (name.isNotEmpty() && dateOfBirth != null && weightVal > 0.0 && heightVal > 0.0) {
+                        viewModel.createProfile(name, dateOfBirth!!, weightVal, heightVal, gender, goal)
                         showSuccessSnackbar = true
                     }
                 },
@@ -183,7 +260,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
 
         item {
             OutlinedButton(
-                onClick = { viewModel.clearProfile() },
+                onClick = { viewModel.signOut() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -192,7 +269,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
             ) {
                 Icon(Icons.Default.Logout, null)
                 Spacer(Modifier.width(8.dp))
-                Text("Repor Perfil (Reiniciar Onboarding)")
+                Text("Encerrar Sessão")
             }
         }
 

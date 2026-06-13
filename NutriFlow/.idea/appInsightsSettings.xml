@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="dam.a51421.nutriflow" />
+                  <option name="mobileSdkAppId" value="1:958855714393:android:0f1b47ef548ad0b010c348" />
+                  <option name="projectId" value="dam-nutriflow" />
+                  <option name="projectNumber" value="958855714393" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

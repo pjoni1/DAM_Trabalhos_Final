@@ -6,15 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7f2c9e96-f689-48cb-8dfc-d14882fb1f20" name="Changes" comment="first commit">
       <change beforePath="$PROJECT_DIR$/../CoroutinesTutorial" beforeDir="false" afterPath="$PROJECT_DIR$/../CoroutinesTutorial" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NutriFlow/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/.idea/deploymentTargetSelector.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/DashboardScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/DashboardScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/LogFoodScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/LogFoodScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MainScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MainScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MealPlanScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/MealPlanScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/ProfileScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../NutriFlow/app/src/main/java/dam/a51421/nutriflow/ui/screens/ProfileScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../tp4gemini/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../tp4gemini/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../tp4gemini/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../tp4gemini/.idea/misc.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
