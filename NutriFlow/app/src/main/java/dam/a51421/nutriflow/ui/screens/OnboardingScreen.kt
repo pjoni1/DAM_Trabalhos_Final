@@ -30,6 +30,9 @@ import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import dam.a51421.nutriflow.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +41,7 @@ fun OnboardingScreen(
     onComplete: () -> Unit
 ) {
     var step by remember { mutableStateOf(1) }
+    val context = LocalContext.current
     
     // Form States
     var name by remember { mutableStateOf("") }
@@ -172,7 +176,7 @@ fun OnboardingScreen(
                     ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         Spacer(Modifier.width(8.dp))
-                        Text("Anterior")
+                        Text(stringResource(R.string.back))
                     }
                     Spacer(Modifier.width(16.dp))
                 }
@@ -180,10 +184,14 @@ fun OnboardingScreen(
                 Button(
                     onClick = {
                         // Validation
+                        val errName = context.getString(R.string.enter_name_error)
+                        val errDob = context.getString(R.string.enter_dob_error)
+                        val errWeight = context.getString(R.string.enter_weight_error)
+                        val errHeight = context.getString(R.string.enter_height_error)
                         when (step) {
                             1 -> {
                                 if (name.trim().isEmpty()) {
-                                    errorMessage = "Por favor, introduz o teu nome."
+                                    errorMessage = errName
                                 } else {
                                     errorMessage = null
                                     step++
@@ -191,7 +199,7 @@ fun OnboardingScreen(
                             }
                             2 -> {
                                 if (dateOfBirth == null) {
-                                    errorMessage = "Por favor, escolhe a tua data de nascimento."
+                                    errorMessage = errDob
                                 } else {
                                     errorMessage = null
                                     step++
@@ -201,9 +209,9 @@ fun OnboardingScreen(
                                 val weightVal = weight.toDoubleOrNull()
                                 val heightVal = height.toDoubleOrNull()
                                 if (weightVal == null || weightVal <= 0.0) {
-                                    errorMessage = "Por favor, introduz um peso válido."
+                                    errorMessage = errWeight
                                 } else if (heightVal == null || heightVal <= 0.0) {
-                                    errorMessage = "Por favor, introduz uma altura válida."
+                                    errorMessage = errHeight
                                 } else {
                                     errorMessage = null
                                     step++
@@ -232,7 +240,7 @@ fun OnboardingScreen(
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(if (step == 4) "Começar" else "Seguinte")
+                    Text(stringResource(if (step == 4) R.string.start else R.string.next))
                     Spacer(Modifier.width(8.dp))
                     Icon(
                         if (step == 4) Icons.Default.CheckCircle else Icons.AutoMirrored.Filled.ArrowForward,
@@ -271,13 +279,13 @@ fun StepWelcomeAndName(
         Spacer(Modifier.height(24.dp))
         
         Text(
-            text = "Bem-vindo ao NutriFlow!",
+            text = stringResource(R.string.onboarding_title),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
         Text(
-            text = "Para começarmos a tua jornada saudável, diz-nos como te chamas.",
+            text = stringResource(R.string.onboarding_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.Gray,
             textAlign = TextAlign.Center,
@@ -289,8 +297,8 @@ fun StepWelcomeAndName(
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text("O teu Nome") },
-            placeholder = { Text("ex: João Silva") },
+            label = { Text(stringResource(R.string.your_name)) },
+            placeholder = { Text(stringResource(R.string.ex_name)) },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -315,12 +323,12 @@ fun StepGenderAndAge(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Sobre ti",
+            text = stringResource(R.string.personal_data),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "A idade e o sexo biológico influenciam os teus gastos energéticos metabólicos base.",
+            text = stringResource(R.string.onboarding_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.Gray,
             textAlign = TextAlign.Center,
@@ -359,7 +367,7 @@ fun StepGenderAndAge(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Homem", 
+                        stringResource(R.string.male), 
                         fontWeight = FontWeight.Bold,
                         color = if (gender == "Male") MaterialTheme.colorScheme.primary else Color.Black
                     )
@@ -391,7 +399,7 @@ fun StepGenderAndAge(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Mulher", 
+                        stringResource(R.string.female), 
                         fontWeight = FontWeight.Bold,
                         color = if (gender == "Female") MaterialTheme.colorScheme.primary else Color.Black
                     )
@@ -420,8 +428,8 @@ fun StepGenderAndAge(
             OutlinedTextField(
                 value = formattedDate,
                 onValueChange = { },
-                label = { Text("Data de Nascimento") },
-                placeholder = { Text("Selecionar data") },
+                label = { Text(stringResource(R.string.date_of_birth)) },
+                placeholder = { Text(stringResource(R.string.select_date)) },
                 enabled = false,
                 readOnly = true,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -451,7 +459,7 @@ fun StepGenderAndAge(
                 },
                 dismissButton = {
                     TextButton(onClick = { showDatePicker = false }) {
-                        Text("Cancelar")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             ) {
@@ -474,12 +482,12 @@ fun StepBiometrics(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Os teus dados físicos",
+            text = stringResource(R.string.physical_data),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "Usamos o peso e a altura para calcular o teu IMC e taxa de metabolismo.",
+            text = stringResource(R.string.keep_physical_data_updated),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.Gray,
             textAlign = TextAlign.Center,
@@ -491,8 +499,8 @@ fun StepBiometrics(
         OutlinedTextField(
             value = weight,
             onValueChange = onWeightChange,
-            label = { Text("Peso Atual (kg)") },
-            placeholder = { Text("ex: 75.5") },
+            label = { Text(stringResource(R.string.weight_kg)) },
+            placeholder = { Text(stringResource(R.string.ex_weight)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
@@ -505,8 +513,8 @@ fun StepBiometrics(
         OutlinedTextField(
             value = height,
             onValueChange = onHeightChange,
-            label = { Text("Altura (cm)") },
-            placeholder = { Text("ex: 178") },
+            label = { Text(stringResource(R.string.height_cm)) },
+            placeholder = { Text(stringResource(R.string.ex_height)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
@@ -527,12 +535,12 @@ fun StepGoal(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Qual é o teu objetivo?",
+            text = stringResource(R.string.goal),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "Ajustaremos a tua meta calórica e divisão de macronutrientes automaticamente.",
+            text = stringResource(R.string.fitness_goal),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.Gray,
             textAlign = TextAlign.Center,
@@ -542,9 +550,9 @@ fun StepGoal(
         Spacer(Modifier.height(24.dp))
 
         val goals = listOf(
-            Triple("Cut", "Perder Peso (Défice)", Icons.AutoMirrored.Filled.TrendingDown),
-            Triple("Maintain", "Manter Forma (Equilíbrio)", Icons.AutoMirrored.Filled.TrendingFlat),
-            Triple("Bulk", "Ganhar Massa (Superávit)", Icons.AutoMirrored.Filled.TrendingUp)
+            Triple("Cut", stringResource(R.string.lose_weight), Icons.AutoMirrored.Filled.TrendingDown),
+            Triple("Maintain", stringResource(R.string.maintain_weight), Icons.AutoMirrored.Filled.TrendingFlat),
+            Triple("Bulk", stringResource(R.string.gain_muscle), Icons.AutoMirrored.Filled.TrendingUp)
         )
 
         goals.forEach { (goalId, goalText, icon) ->

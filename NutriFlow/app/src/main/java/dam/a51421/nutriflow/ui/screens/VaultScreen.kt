@@ -30,6 +30,8 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import dam.a51421.nutriflow.data.model.MediaEntry
 import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
+import androidx.compose.ui.res.stringResource
+import dam.a51421.nutriflow.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -42,7 +44,7 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
     var activeZoomImage by remember { mutableStateOf<MediaEntry?>(null) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
+        contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             uri?.let {
                 viewModel.addMediaEntry(it, selectedTab)
@@ -65,9 +67,7 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
             if (filteredMedia.isNotEmpty()) {
                 FloatingActionButton(
                     onClick = {
-                        photoPickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
+                        photoPickerLauncher.launch("image/*")
                     },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -95,14 +95,14 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
                 FilterChip(
                     selected = selectedTab == "Evolution",
                     onClick = { selectedTab = "Evolution" },
-                    label = { Text("Evolução Física") },
+                    label = { Text(stringResource(R.string.physical_evolution)) },
                     leadingIcon = { Icon(Icons.Default.FitnessCenter, null) },
                     shape = RoundedCornerShape(12.dp)
                 )
                 FilterChip(
                     selected = selectedTab == "Food",
                     onClick = { selectedTab = "Food" },
-                    label = { Text("Fotos de Refeições") },
+                    label = { Text(stringResource(R.string.meal_photos)) },
                     leadingIcon = { Icon(Icons.Default.Restaurant, null) },
                     shape = RoundedCornerShape(12.dp)
                 )
@@ -112,14 +112,12 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
 
             // Cabeçalho da categoria ativa
             Text(
-                text = if (selectedTab == "Evolution") "Cofre de Evolução" else "Diário de Refeições",
+                text = stringResource(if (selectedTab == "Evolution") R.string.evolution_vault else R.string.meal_diary),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineSmall
             )
             Text(
-                text = if (selectedTab == "Evolution") 
-                    "Regista o teu progresso físico ao longo do tempo." 
-                    else "Guarda fotografias dos teus pratos favoritos.",
+                text = stringResource(if (selectedTab == "Evolution") R.string.evolution_vault_subtitle else R.string.meal_diary_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -150,16 +148,14 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
                         }
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = if (selectedTab == "Evolution") "Ainda sem fotos de evolução" else "Sem fotos de refeições",
+                            text = stringResource(if (selectedTab == "Evolution") R.string.empty_evolution else R.string.empty_meal),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleMedium,
                             textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = if (selectedTab == "Evolution") 
-                                "Tira fotos regulares para veres a tua transformação organizada mês a mês." 
-                                else "Cria um portefólio visual saudável das refeições que consomes.",
+                            text = stringResource(if (selectedTab == "Evolution") R.string.empty_evolution_subtitle else R.string.empty_meal_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                             textAlign = TextAlign.Center,
@@ -168,15 +164,13 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
                         Spacer(Modifier.height(24.dp))
                         Button(
                             onClick = {
-                                photoPickerLauncher.launch(
-                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                )
+                                photoPickerLauncher.launch("image/*")
                             },
                             shape = RoundedCornerShape(16.dp)
                         ) {
                             Icon(Icons.Default.Add, null)
                             Spacer(Modifier.width(8.dp))
-                            Text("Adicionar Primeira Foto")
+                            Text(stringResource(R.string.add_first_photo))
                         }
                     }
                 }

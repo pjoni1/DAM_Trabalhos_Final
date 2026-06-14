@@ -1,3 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NutriFlow</string>
+    
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="start">Start</string>
+    <string name="protein">Protein</string>
+    <string name="carbs">Carbs</string>
+    <string name="fats">Fats</string>
+    <string name="name">Name</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="height_cm">Height (cm)</string>
+    
+    <!-- Auth Screen -->
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="login_subtitle">Login to access your dashboard.</string>
+    <string name="create_account">Create Account</string>
+    <string name="register_subtitle">Register to start your fitness journey.</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="no_account">Don\'t have an account? Register</string>
+    <string name="already_have_account">Already have an account? Login</string>
+    <string name="wrong_password">Incorrect password.</string>
+    <string name="username_exists">This username already exists.</string>
+    <string name="db_error">Error connecting to the database.</string>
+    <string name="register_error">Error registering user.</string>
+    
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title">Let\'s Get to Know You!</string>
+    <string name="onboarding_subtitle">We need some information to personalize your experience.</string>
+    <string name="personal_data">Personal Data</string>
+    <string name="physical_data">Physical Data</string>
+    <string name="gender">Gender</string>
+    <string name="goal">Goal</string>
+    <string name="select_date">Select date</string>
+    <string name="your_name">Your Name</string>
+    <string name="ex_name">e.g. John Doe</string>
+    <string name="ex_weight">e.g. 75.5</string>
+    <string name="ex_height">e.g. 178</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="lose_weight">Lose Weight (Deficit)</string>
+    <string name="maintain_weight">Maintain Shape</string>
+    <string name="gain_muscle">Gain Muscle (Surplus)</string>
+    <string name="enter_name_error">Please enter your name.</string>
+    <string name="enter_dob_error">Please select your date of birth.</string>
+    <string name="enter_weight_error">Please enter a valid weight.</string>
+    <string name="enter_height_error">Please enter a valid height.</string>
+    <string name="enter_food_name_error">Please enter the food name.</string>
+    <string name="enter_calories_error">Please enter a valid calories amount.</string>
+
+    <!-- Profile Screen -->
+    <string name="biometric_profile">Biometric Profile</string>
+    <string name="keep_physical_data_updated">Keep your physical data updated.</string>
+    <string name="fitness_goal">Fitness Goal</string>
+    <string name="log_out">Log Out</string>
+    <string name="profile_updated">Profile and goals updated successfully!</string>
+    <string name="language">Language</string>
+    
+    <string name="dashboard">Dashboard</string>
+    <string name="meal_plan">Meal Plan</string>
+    <string name="vault">Vault</string>
+    <string name="profile">Profile</string>
+    <string name="days_streak">%1$d Days Streak!</string>
+    <string name="start_your_streak">Start your Streak!</string>
+    <string name="today">TODAY</string>
+    <string name="yesterday">YESTERDAY</string>
+    <string name="tomorrow">TOMORROW</string>
+    <string name="x_days_ago">%1$d DAYS AGO</string>
+    <string name="in_x_days">IN %1$d DAYS</string>
+    <string name="empty_dashboard_today">No meals logged today yet. Use the Log Food button below!</string>
+    <string name="empty_dashboard_other">No meals logged for %1$s.</string>
+    <string name="daily_goal">Daily Goal</string>
+    <string name="consumed">Consumed</string>
+    <string name="calories_left">CALORIES LEFT</string>
+    <string name="energy_today">Today\'s Energy</string>
+    <string name="energy_yesterday">Yesterday\'s Energy</string>
+    <string name="energy_tomorrow">Tomorrow\'s Energy</string>
+    <string name="energy_x_days_ago">Energy %1$d days ago</string>
+    <string name="energy_in_x_days">Energy in %1$d days</string>
+    <string name="your_streak">Your Streak</string>
+    <string name="recent_meals">Recent Meals</string>
+    
+    <!-- Meal Plan Screen -->
+    <string name="meal_plan_subtitle">Plan your meals for this day.</string>
+    <string name="start_week_well">Start the week well!</string>
+    <string name="target_kcal">Target: %1$d kcal</string>
+    <string name="macros">Macros: %1$dg P | %2$dg C | %3$dg F</string>
+    <string name="no_meals_planned">No meals planned for this day.</string>
+    
+    <!-- Log Food Screen -->
+    <string name="log_food">Log Food</string>
+    <string name="search_database">Search in database...</string>
+    <string name="search_camera">Search with Camera</string>
+    <string name="manual_entry">Manual Entry</string>
+    <string name="food_name">Food Name</string>
+    <string name="ex_food_name">e.g. Scrambled Eggs</string>
+    <string name="calories_kcal">Calories (kcal)</string>
+    <string name="qty_g_ml">Qty (g/ml)</string>
+    <string name="macronutrients_optional">Macronutrients (Optional)</string>
+    <string name="register_food">Register Food</string>
+    <string name="food_registered">Food registered successfully!</string>
+    
+    <!-- Vault Screen -->
+    <string name="physical_evolution">Physical Evolution</string>
+    <string name="meal_photos">Meal Photos</string>
+    <string name="add_first_photo">Add First Photo</string>
+    <string name="evolution_vault">Evolution Vault</string>
+    <string name="meal_diary">Meal Diary</string>
+    <string name="evolution_vault_subtitle">Log your physical progress over time.</string>
+    <string name="meal_diary_subtitle">Save photos of your favorite dishes.</string>
+    <string name="empty_evolution">No evolution photos yet</string>
+    <string name="empty_meal">No meal photos yet</string>
+    <string name="empty_evolution_subtitle">Take regular photos to see your transformation organized month by month.</string>
+    <string name="empty_meal_subtitle">Create a healthy visual portfolio of the meals you consume.</string>
 </resources>

@@ -10,8 +10,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.rememberNavController
 import dam.a51421.nutriflow.ui.components.NutriFlowScaffold
 import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
+import androidx.compose.ui.res.stringResource
+import dam.a51421.nutriflow.R
 
 @Composable
 fun MainScreen() {
@@ -30,31 +33,42 @@ fun MainScreen() {
         )
     } else {
         val navController = rememberNavController()
-        var currentScreen by remember { mutableStateOf("Dashboard") }
+        var currentScreen by remember { mutableStateOf("dashboard") }
+
+        val title = when (currentScreen) {
+            "dashboard" -> stringResource(R.string.dashboard)
+            "mealplan" -> stringResource(R.string.meal_plan)
+            "vault" -> stringResource(R.string.vault)
+            "profile" -> stringResource(R.string.profile)
+            "logfood" -> stringResource(R.string.log_food)
+            else -> ""
+        }
 
         NutriFlowScaffold(
-            title = currentScreen,
+            title = title,
             currentScreen = currentScreen,
             onNavigate = { screen ->
                 currentScreen = screen
-                navController.navigate(screen.lowercase().replace(" ", "")) {
+                navController.navigate(screen) {
                     // Evitar acumulação de ecrãs na pilha
                     popUpTo("dashboard") { saveState = true }
                     launchSingleTop = true
                     restoreState = true
                 }
             },
+            currentLanguage = viewModel.currentLanguage.collectAsState().value,
+            onLanguageChange = { viewModel.changeLanguage(it) },
             floatingActionButton = {
-                if (currentScreen == "Dashboard" || currentScreen == "Meal Plan") {
+                if (currentScreen == "dashboard" || currentScreen == "mealplan") {
                     ExtendedFloatingActionButton(
                         onClick = {
-                            currentScreen = "Log Food"
+                            currentScreen = "logfood"
                             navController.navigate("logfood")
                         },
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
                         icon = { Icon(Icons.Default.Add, contentDescription = "Log Food") },
-                        text = { Text("Log Food") }
+                        text = { Text(stringResource(R.string.log_food)) }
                     )
                 }
             }
@@ -80,7 +94,7 @@ fun MainScreen() {
                     LogFoodScreen(
                         viewModel = viewModel,
                         onNavigateBack = {
-                            currentScreen = "Dashboard"
+                            currentScreen = "dashboard"
                             navController.popBackStack()
                         }
                     )

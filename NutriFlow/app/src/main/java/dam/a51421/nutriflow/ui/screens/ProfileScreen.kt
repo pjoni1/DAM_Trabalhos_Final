@@ -25,6 +25,8 @@ import androidx.activity.result.PickVisualMediaRequest
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
 import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
+import androidx.compose.ui.res.stringResource
+import dam.a51421.nutriflow.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -56,7 +58,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
     var showSuccessSnackbar by remember { mutableStateOf(false) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
+        contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
                 viewModel.updateProfilePicture(uri.toString())
@@ -78,7 +80,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                     .clickable {
-                        photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        photoPickerLauncher.launch("image/*")
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -99,8 +101,8 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
                 }
             }
             Spacer(Modifier.height(8.dp))
-            Text("Perfil Biométrico", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineSmall)
-            Text("Mantém os teus dados físicos atualizados.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+            Text(stringResource(R.string.biometric_profile), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.keep_physical_data_updated), style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
         }
 
         item {
@@ -111,12 +113,12 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Dados Físicos", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.physical_data), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                     
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Nome") },
+                        label = { Text(stringResource(R.string.name)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -140,7 +142,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
                         OutlinedTextField(
                             value = formattedDate,
                             onValueChange = { },
-                            label = { Text("Data de Nascimento") },
+                            label = { Text(stringResource(R.string.date_of_birth)) },
                             enabled = false,
                             readOnly = true,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -184,7 +186,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
                         OutlinedTextField(
                             value = weight,
                             onValueChange = { weight = it },
-                            label = { Text("Peso (kg)") },
+                            label = { Text(stringResource(R.string.weight_kg)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
@@ -192,7 +194,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
                         OutlinedTextField(
                             value = height,
                             onValueChange = { height = it },
-                            label = { Text("Altura (cm)") },
+                            label = { Text(stringResource(R.string.height_cm)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
@@ -210,13 +212,13 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Objetivo de Fitness", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.fitness_goal), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(12.dp))
                     
                     val goals = listOf(
-                        "Cut" to "Perder Peso (Défice)",
-                        "Maintain" to "Manter Forma",
-                        "Bulk" to "Ganhar Massa (Superávit)"
+                        "Cut" to stringResource(R.string.lose_weight),
+                        "Maintain" to stringResource(R.string.maintain_weight),
+                        "Bulk" to stringResource(R.string.gain_muscle)
                     )
                     
                     goals.forEach { (goalId, goalLabel) ->
@@ -254,7 +256,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
             ) {
                 Icon(Icons.Default.Save, null)
                 Spacer(Modifier.width(8.dp))
-                Text("Guardar Alterações")
+                Text(stringResource(R.string.save_changes))
             }
         }
 
@@ -269,7 +271,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
             ) {
                 Icon(Icons.Default.Logout, null)
                 Spacer(Modifier.width(8.dp))
-                Text("Encerrar Sessão")
+                Text(stringResource(R.string.log_out))
             }
         }
 
@@ -285,7 +287,7 @@ fun ProfileScreen(viewModel: NutriFlowViewModel) {
             },
             modifier = Modifier.padding(16.dp)
         ) {
-            Text("Perfil e metas atualizados com sucesso!")
+            Text(stringResource(R.string.profile_updated))
         }
     }
-}
+}

@@ -83,10 +83,24 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
     private val _mediaEntries = MutableStateFlow<List<MediaEntry>>(emptyList())
     val mediaEntries: StateFlow<List<MediaEntry>> = _mediaEntries.asStateFlow()
 
+    // Linguagem
+    private val _currentLanguage = MutableStateFlow("en")
+    val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
+
+    fun changeLanguage(languageCode: String) {
+        sharedPreferences.edit().putString("language", languageCode).apply()
+        _currentLanguage.value = languageCode
+    }
+
     init {
+        val savedLang = sharedPreferences.getString("language", "pt") ?: "pt"
+        _currentLanguage.value = savedLang
+
         loadProfileFromPreferences()
         loadDefaultMealPlan()
         loadMediaFromPreferences()
+        loadMealEntriesFromPreferences()
+        recalculateStreak()
         
         // Se estiver logado, garante que trazemos tudo da Cloud
         val uid = sharedPreferences.getString("id", null)
@@ -127,6 +141,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             val carbsGoal = sharedPreferences.getInt("carbsGoal", 220)
             val fatsGoal = sharedPreferences.getInt("fatsGoal", 65)
             val streak = sharedPreferences.getInt("streak", 0)
+            val lastActive = sharedPreferences.getLong("lastActive", System.currentTimeMillis())
 
             _userProfile.value = UserProfile(
                 id = id,
@@ -141,6 +156,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                 dailyCarbsGoal = carbsGoal,
                 dailyFatsGoal = fatsGoal,
                 streakCount = streak,
+                lastActiveTimestamp = lastActive,
                 dateOfBirth = dateOfBirth,
                 profilePictureUri = profilePictureUri
             )
@@ -181,6 +197,11 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         val remainingCalories = calorieGoal - (proteinGoal * 4) - (fatsGoal * 9)
         val carbsGoal = (remainingCalories / 4).toInt().coerceAtLeast(50)
 
+        val existingProfile = _userProfile.value
+        val streakToKeep = existingProfile?.streakCount ?: 0
+        val lastActiveToKeep = existingProfile?.lastActiveTimestamp ?: 0L
+        val picToKeep = existingProfile?.profilePictureUri
+
         val profile = UserProfile(
             id = id,
             name = name,
@@ -193,9 +214,10 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             dailyProteinGoal = proteinGoal,
             dailyCarbsGoal = carbsGoal,
             dailyFatsGoal = fatsGoal,
-            streakCount = 0,
+            streakCount = streakToKeep,
+            lastActiveTimestamp = lastActiveToKeep,
             dateOfBirth = dateOfBirth,
-            profilePictureUri = _userProfile.value?.profilePictureUri // Keep existing if updating
+            profilePictureUri = picToKeep
         )
 
         // Guardar localmente
@@ -212,7 +234,9 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             putInt("proteinGoal", proteinGoal)
             putInt("carbsGoal", carbsGoal)
             putInt("fatsGoal", fatsGoal)
-            putInt("streak", 0)
+            putInt("streak", streakToKeep)
+            putLong("lastActive", lastActiveToKeep)
+            if (picToKeep != null) putString("profilePictureUri", picToKeep)
             apply()
         }
 
@@ -252,7 +276,11 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
     // Carregar Plano Alimentar Default de Exemplo
     private fun loadDefaultMealPlan() {
         val offset = _selectedDateOffset.value
-        val planType = Math.abs(offset) % 3
+        val startOfDayMillis = getStartOfDayMillis(offset)
+        
+        // Use an absolute day index so the meal plan is always the same for a specific date
+        val dayIndex = (startOfDayMillis / 86400000L).toInt()
+        val planType = Math.abs(dayIndex) % 3
 
         val defaultFoods = when (planType) {
             1 -> listOf(
@@ -277,9 +305,11 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             )
         }
 
+        val dayOfWeek = java.util.Calendar.getInstance().apply { timeInMillis = startOfDayMillis }.get(java.util.Calendar.DAY_OF_WEEK)
+
         _currentMealPlan.value = MealPlan(
-            id = "plan_offset_$offset",
-            dayOfWeek = (offset % 7 + 7) % 7 + 1,
+            id = "plan_date_$dayIndex",
+            dayOfWeek = dayOfWeek,
             targetFoods = defaultFoods
         )
     }
@@ -301,7 +331,8 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             type = "Free Entry"
         )
         _mealEntries.value = _mealEntries.value + newEntry
-        checkAndIncrementStreak()
+        saveMealEntriesToPreferences(_mealEntries.value)
+        recalculateStreak()
 
         // Sincronizar com o Firestore
         val profile = _userProfile.value
@@ -347,7 +378,8 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                 type = "Plan Item"
             )
             _mealEntries.value = _mealEntries.value + newEntry
-            checkAndIncrementStreak()
+            saveMealEntriesToPreferences(_mealEntries.value)
+            recalculateStreak()
 
             // Sincronizar com o Firestore
             val profile = _userProfile.value
@@ -381,6 +413,8 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
 
         if (entryToRemove != null) {
             _mealEntries.value = _mealEntries.value.filter { it.id != entryToRemove.id }
+            saveMealEntriesToPreferences(_mealEntries.value)
+            recalculateStreak()
             
             val profile = _userProfile.value
             if (profile != null) {
@@ -396,31 +430,47 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             db.collection("profiles").document(profile.id).collection("mealEntries").document(entryId).delete()
         }
         _mealEntries.value = _mealEntries.value.filterNot { it.id == entryId }
+        saveMealEntriesToPreferences(_mealEntries.value)
+        recalculateStreak()
     }
 
     // Lógica simples de Streaks (se atingir 85%+ da meta calórica ou completar itens principais)
-    private fun checkAndIncrementStreak() {
+    // Recalcular a streak dinamicamente baseada no histórico de refeições
+    private fun recalculateStreak() {
         val profile = _userProfile.value ?: return
-        val totalCaloriesConsumed = _mealEntries.value.sumOf { it.calories }
         
-        // Se estiver dentro de 85% e 115% da meta
         val minTarget = profile.dailyCalorieGoal * 0.85
         val maxTarget = profile.dailyCalorieGoal * 1.15
         
-        if (totalCaloriesConsumed.toDouble() in minTarget..maxTarget) {
-            val lastActive = sharedPreferences.getLong("lastActive", 0)
-            val today = System.currentTimeMillis() / (24 * 60 * 60 * 1000)
-            val lastDay = lastActive / (24 * 60 * 60 * 1000)
-            
-            if (today > lastDay) {
-                val newStreak = profile.streakCount + 1
-                sharedPreferences.edit().putInt("streak", newStreak).putLong("lastActive", System.currentTimeMillis()).apply()
-                _userProfile.value = profile.copy(streakCount = newStreak)
-
-                // Atualizar no Firestore
-                db.collection("profiles").document(profile.id)
-                    .update(mapOf("streakCount" to newStreak, "lastActiveTimestamp" to System.currentTimeMillis()))
+        var currentStreak = 0
+        
+        // Verificar dias anteriores (começa ontem)
+        var daysBack = 1
+        while (true) {
+            val start = getStartOfDayMillis(-daysBack)
+            val end = start + 86400000L
+            val cals = _mealEntries.value.filter { it.timestamp in start until end }.sumOf { it.calories }
+            if (cals.toDouble() in minTarget..maxTarget) {
+                currentStreak++
+                daysBack++
+            } else {
+                break
             }
+        }
+        
+        // Verificar o dia de hoje
+        val startToday = getStartOfDayMillis(0)
+        val endToday = startToday + 86400000L
+        val calsToday = _mealEntries.value.filter { it.timestamp in startToday until endToday }.sumOf { it.calories }
+        if (calsToday.toDouble() in minTarget..maxTarget) {
+            currentStreak++
+        }
+        
+        // Se houver diferença, atualiza
+        if (profile.streakCount != currentStreak) {
+            _userProfile.value = profile.copy(streakCount = currentStreak)
+            sharedPreferences.edit().putInt("streak", currentStreak).apply()
+            db.collection("profiles").document(profile.id).update(mapOf("streakCount" to currentStreak))
         }
     }
 
@@ -447,6 +497,38 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
     private fun saveMediaToPreferences(entries: List<MediaEntry>) {
         val serialized = entries.joinToString("|ENTRY|") { "${it.id}|_|${it.filePath}|_|${it.category}|_|${it.date}" }
         sharedPreferences.edit().putString("mediaEntries", serialized).apply()
+    }
+
+    // Carregar refeições guardadas localmente
+    private fun loadMealEntriesFromPreferences() {
+        val serialized = sharedPreferences.getString("localMealEntries", null) ?: return
+        val list = serialized.split("|ENTRY|").mapNotNull { entryStr ->
+            val parts = entryStr.split("|_|")
+            if (parts.size >= 9) {
+                try {
+                    MealEntry(
+                        id = parts[0],
+                        foodName = parts[1],
+                        calories = parts[2].toInt(),
+                        protein = parts[3].toInt(),
+                        carbs = parts[4].toInt(),
+                        fats = parts[5].toInt(),
+                        quantity = parts[6].toDouble(),
+                        timestamp = parts[7].toLong(),
+                        type = parts[8]
+                    )
+                } catch (e: Exception) { null }
+            } else null
+        }
+        _mealEntries.value = list
+    }
+
+    // Guardar refeições localmente
+    private fun saveMealEntriesToPreferences(entries: List<MealEntry>) {
+        val serialized = entries.joinToString("|ENTRY|") { 
+            "${it.id}|_|${it.foodName}|_|${it.calories}|_|${it.protein}|_|${it.carbs}|_|${it.fats}|_|${it.quantity}|_|${it.timestamp}|_|${it.type}"
+        }
+        sharedPreferences.edit().putString("localMealEntries", serialized).apply()
     }
 
     // Adicionar nova foto ao Vault
@@ -502,7 +584,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         val profileId = profile.id
 
         // 1. Sincronizar perfil
-        val profileData = hashMapOf(
+        val profileData = hashMapOf<String, Any>(
             "name" to profile.name,
             "age" to profile.age,
             "weight" to profile.weight,
@@ -516,6 +598,8 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
             "streakCount" to profile.streakCount,
             "lastActiveTimestamp" to profile.lastActiveTimestamp
         )
+        if (profile.dateOfBirth != null) profileData["dateOfBirth"] = profile.dateOfBirth
+        if (profile.profilePictureUri != null) profileData["profilePictureUri"] = profile.profilePictureUri
         db.collection("profiles").document(profileId).set(profileData)
 
         // 2. Sincronizar vault (fotos)
@@ -574,7 +658,6 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         
         val userDoc = username.trim().lowercase()
         db.collection("users").document(userDoc).get().addOnCompleteListener { task ->
-            _isAuthLoading.value = false
             if (task.isSuccessful) {
                 val doc = task.result
                 if (doc != null && doc.exists()) {
@@ -582,9 +665,12 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                     if (savedPass == pass) {
                         val profileId = doc.getString("profileId") ?: UUID.randomUUID().toString()
                         sharedPreferences.edit().putString("auth_username", userDoc).putString("id", profileId).apply()
-                        _isUserAuthenticated.value = true
-                        loadProfileFromFirestore(profileId)
+                        loadProfileFromFirestore(profileId, onComplete = {
+                            _isUserAuthenticated.value = true
+                            _isAuthLoading.value = false
+                        })
                     } else {
+                        _isAuthLoading.value = false
                         _authError.value = "Palavra-passe incorreta."
                     }
                 } else {
@@ -636,7 +722,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         _authError.value = null
     }
 
-    private fun loadProfileFromFirestore(uid: String) {
+    private fun loadProfileFromFirestore(uid: String, onComplete: (() -> Unit)? = null) {
         db.collection("profiles").document(uid).get().addOnSuccessListener { doc ->
             if (doc.exists()) {
                 val name = doc.getString("name") ?: ""
@@ -652,6 +738,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                 val streakCount = doc.getLong("streakCount")?.toInt() ?: 0
                 val dateOfBirth = doc.getLong("dateOfBirth")
                 val profilePictureUri = doc.getString("profilePictureUri")
+                val lastActiveTimestamp = doc.getLong("lastActiveTimestamp") ?: System.currentTimeMillis()
                 
                 _userProfile.value = UserProfile(
                     id = uid,
@@ -666,6 +753,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                     dailyCarbsGoal = carbsGoal,
                     dailyFatsGoal = fatsGoal,
                     streakCount = streakCount,
+                    lastActiveTimestamp = lastActiveTimestamp,
                     dateOfBirth = dateOfBirth,
                     profilePictureUri = profilePictureUri
                 )
@@ -685,6 +773,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                     putInt("carbsGoal", carbsGoal)
                     putInt("fatsGoal", fatsGoal)
                     putInt("streak", streakCount)
+                    putLong("lastActive", lastActiveTimestamp)
                     apply()
                 }
 
@@ -728,6 +817,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                             )
                         }
                         _mealEntries.value = entriesList
+                        saveMealEntriesToPreferences(entriesList)
                     }
 
                 // 3. Carregar Plano Alimentar
@@ -752,11 +842,16 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                                         dayOfWeek = dayOfWeek,
                                         targetFoods = targetFoodsList
                                     )
-                                }
+                                    onComplete?.invoke()
+                                }.addOnFailureListener { onComplete?.invoke() }
+                        } else {
+                            onComplete?.invoke()
                         }
-                    }
+                    }.addOnFailureListener { onComplete?.invoke() }
+            } else {
+                onComplete?.invoke()
             }
-        }
+        }.addOnFailureListener { onComplete?.invoke() }
     }
 
     // --- PESQUISA DE ALIMENTOS (AUTOCOMPLETE) ---

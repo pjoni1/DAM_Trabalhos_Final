@@ -21,6 +21,8 @@ import dam.a51421.nutriflow.data.model.TargetFood
 import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.res.stringResource
+import dam.a51421.nutriflow.R
 
 @Composable
 fun MealPlanScreen(viewModel: NutriFlowViewModel) {
@@ -31,14 +33,14 @@ fun MealPlanScreen(viewModel: NutriFlowViewModel) {
     val displayDate = remember(offset) {
         val cal = Calendar.getInstance()
         cal.add(Calendar.DAY_OF_YEAR, offset)
-        SimpleDateFormat("dd 'de' MMMM, yyyy", Locale.forLanguageTag("pt-PT")).format(cal.time)
+        SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault()).format(cal.time)
     }
 
     val label = when (offset) {
-        0 -> "HOJE"
-        -1 -> "ONTEM"
-        1 -> "AMANHÃ"
-        else -> if (offset < 0) "HÁ ${-offset} DIAS" else "DAQUI A $offset DIAS"
+        0 -> stringResource(R.string.today)
+        -1 -> stringResource(R.string.yesterday)
+        1 -> stringResource(R.string.tomorrow)
+        else -> if (offset < 0) stringResource(R.string.x_days_ago, -offset) else stringResource(R.string.in_x_days, offset)
     }
 
     LazyColumn(
@@ -87,7 +89,7 @@ fun MealPlanScreen(viewModel: NutriFlowViewModel) {
         if (targetFoods.isEmpty()) {
             item {
                 Text(
-                    "Nenhum plano alimentar disponível para hoje.",
+                    stringResource(R.string.no_meals_planned),
                     modifier = Modifier.padding(16.dp),
                     color = Color.Gray
                 )

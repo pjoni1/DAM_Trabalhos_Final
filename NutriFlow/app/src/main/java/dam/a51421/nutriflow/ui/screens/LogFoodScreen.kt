@@ -20,6 +20,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
+import androidx.compose.ui.res.stringResource
+import dam.a51421.nutriflow.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +30,7 @@ fun LogFoodScreen(
     onNavigateBack: () -> Unit
 ) {
     var foodName by remember { mutableStateOf("") }
+    val context = androidx.compose.ui.platform.LocalContext.current
     var calories by remember { mutableStateOf("") }
     var protein by remember { mutableStateOf("") }
     var carbs by remember { mutableStateOf("") }
@@ -46,7 +49,7 @@ fun LogFoodScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Log Food", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.log_food), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -71,7 +74,7 @@ fun LogFoodScreen(
                         viewModel.searchFoods(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Pesquisar na base de dados...") },
+                    placeholder = { Text(stringResource(R.string.search_database)) },
                     leadingIcon = { Icon(Icons.Default.Search, null) },
                     trailingIcon = { 
                         if (searchQuery.isNotEmpty()) {
@@ -140,13 +143,13 @@ fun LogFoodScreen(
                 ) {
                     Icon(Icons.Default.CameraAlt, contentDescription = "Câmara")
                     Spacer(Modifier.width(8.dp))
-                    Text("Pesquisar com Câmara", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.search_camera), fontWeight = FontWeight.Bold)
                 }
             }
 
             // Formulário Manual
             item {
-                Text("Registo Manual", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.manual_entry), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(8.dp))
                 
                 Card(
@@ -162,8 +165,8 @@ fun LogFoodScreen(
                         OutlinedTextField(
                             value = foodName,
                             onValueChange = { foodName = it },
-                            label = { Text("Nome do Alimento") },
-                            placeholder = { Text("ex: Ovos Mexidos") },
+                            label = { Text(stringResource(R.string.food_name)) },
+                            placeholder = { Text(stringResource(R.string.ex_food_name)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -172,7 +175,7 @@ fun LogFoodScreen(
                             OutlinedTextField(
                                 value = calories,
                                 onValueChange = { calories = it },
-                                label = { Text("Calorias (kcal)") },
+                                label = { Text(stringResource(R.string.calories_kcal)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
@@ -180,20 +183,20 @@ fun LogFoodScreen(
                             OutlinedTextField(
                                 value = quantity,
                                 onValueChange = { quantity = it },
-                                label = { Text("Qtd (g / ml)") },
+                                label = { Text(stringResource(R.string.qty_g_ml)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
                             )
                         }
 
-                        Text("Macronutrientes (Opcional)", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                        Text(stringResource(R.string.macronutrients_optional), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
 
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedTextField(
                                 value = protein,
                                 onValueChange = { protein = it },
-                                label = { Text("Prot (g)") },
+                                label = { Text(stringResource(R.string.protein).plus(" (g)")) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
@@ -201,7 +204,7 @@ fun LogFoodScreen(
                             OutlinedTextField(
                                 value = carbs,
                                 onValueChange = { carbs = it },
-                                label = { Text("HC (g)") },
+                                label = { Text(stringResource(R.string.carbs).plus(" (g)")) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
@@ -209,7 +212,7 @@ fun LogFoodScreen(
                             OutlinedTextField(
                                 value = fats,
                                 onValueChange = { fats = it },
-                                label = { Text("Lip (g)") },
+                                label = { Text(stringResource(R.string.fats).plus(" (g)")) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
@@ -242,10 +245,12 @@ fun LogFoodScreen(
                         val carbsVal = carbs.toIntOrNull() ?: 0
                         val fatsVal = fats.toIntOrNull() ?: 0
 
+                        val errFoodName = context.getString(R.string.enter_food_name_error)
+                        val errCalories = context.getString(R.string.enter_calories_error)
                         if (foodName.trim().isEmpty()) {
-                            errorMessage = "Por favor, introduz o nome do alimento."
+                            errorMessage = errFoodName
                         } else if (caloriesVal == null || caloriesVal < 0) {
-                            errorMessage = "Por favor, introduz um valor de calorias válido."
+                            errorMessage = errCalories
                         } else {
                             viewModel.logManualFood(
                                 name = foodName,
@@ -266,7 +271,7 @@ fun LogFoodScreen(
                 ) {
                     Icon(Icons.Default.AddCircleOutline, null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Registar Alimento")
+                    Text(stringResource(R.string.log_food))
                 }
             }
 

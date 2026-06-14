@@ -25,6 +25,8 @@ import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import dam.a51421.nutriflow.R
 
 @Composable
 fun DashboardScreen(viewModel: NutriFlowViewModel) {
@@ -35,14 +37,14 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
     val displayDate = remember(offset) {
         val cal = Calendar.getInstance()
         cal.add(Calendar.DAY_OF_YEAR, offset)
-        SimpleDateFormat("dd 'de' MMMM, yyyy", Locale.forLanguageTag("pt-PT")).format(cal.time)
+        SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault()).format(cal.time)
     }
 
     val label = when (offset) {
-        0 -> "HOJE"
-        -1 -> "ONTEM"
-        1 -> "AMANHÃ"
-        else -> if (offset < 0) "HÁ ${-offset} DIAS" else "DAQUI A $offset DIAS"
+        0 -> stringResource(R.string.today)
+        -1 -> stringResource(R.string.yesterday)
+        1 -> stringResource(R.string.tomorrow)
+        else -> if (offset < 0) stringResource(R.string.x_days_ago, -offset) else stringResource(R.string.in_x_days, offset)
     }
 
     // Cálculos dinâmicos
@@ -140,13 +142,13 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = if (streak > 0) "$streak Dias de Streak!" else "Começa a tua Streak!", 
+                            text = if (streak > 0) stringResource(R.string.days_streak, streak) else stringResource(R.string.start_your_streak), 
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = if (streak > 0) "Estás a esmagar as tuas metas. Mantém o foco!" 
-                                   else "Regista o teu plano ou alimentos para iniciar a tua streak diária.", 
+                            text = if (streak > 0) "Keep smashing your goals. Stay focused!" 
+                                   else "Log your meal plan to start your daily streak.", 
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )
@@ -167,7 +169,13 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Energia de Hoje", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                    val energiaTitle = when (offset) {
+                        0 -> stringResource(R.string.energy_today)
+                        -1 -> stringResource(R.string.energy_yesterday)
+                        1 -> stringResource(R.string.energy_tomorrow)
+                        else -> if (offset < 0) stringResource(R.string.energy_x_days_ago, -offset) else stringResource(R.string.energy_in_x_days, offset)
+                    }
+                    Text(energiaTitle, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
                     Spacer(Modifier.height(24.dp))
 
                     Box(contentAlignment = Alignment.Center) {
@@ -185,19 +193,19 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
-                            Text("CAL RESTANTES", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                            Text(stringResource(R.string.calories_left), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                         }
                     }
 
                     Spacer(Modifier.height(24.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Consumido", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                            Text(stringResource(R.string.consumed), style = MaterialTheme.typography.labelMedium, color = Color.Gray)
                             Text("$totalCaloriesConsumed kcal", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                         VerticalDivider(modifier = Modifier.height(40.dp).width(1.dp), color = Color.LightGray)
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Meta Diária", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                            Text(stringResource(R.string.daily_goal), style = MaterialTheme.typography.labelMedium, color = Color.Gray)
                             Text("$calorieGoal kcal", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     }
@@ -207,7 +215,7 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
 
         // Macronutrientes
         item {
-            Text("Macronutrientes", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.macronutrients_optional).replace(" (Opcional)", "").replace(" (Optional)", ""), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(4.dp))
             
             val proteinProgress = if (proteinGoal > 0) (totalProteinConsumed.toFloat() / proteinGoal).coerceIn(0f, 1f) else 0f
@@ -223,7 +231,7 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
         if (entries.isNotEmpty()) {
             item {
                 Spacer(Modifier.height(8.dp))
-                Text("Refeições Registadas ($label)", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                Text("${stringResource(R.string.recent_meals)} ($label)", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             }
 
             items(entries) { entry ->
@@ -273,8 +281,8 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
                     border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
                 ) {
                     Text(
-                        text = if (offset == 0) "Ainda não registaste nenhuma refeição hoje. Usa o botão 'Log Food' abaixo!" 
-                               else "Não há refeições registadas para $label.",
+                        text = if (offset == 0) stringResource(R.string.empty_dashboard_today) 
+                               else stringResource(R.string.empty_dashboard_other, label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                         textAlign = TextAlign.Center,

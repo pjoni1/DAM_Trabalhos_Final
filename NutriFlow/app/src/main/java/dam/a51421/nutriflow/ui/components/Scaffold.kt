@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import dam.a51421.nutriflow.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,9 +28,13 @@ fun NutriFlowScaffold(
     title: String,
     currentScreen: String,
     onNavigate: (String) -> Unit,
+    currentLanguage: String = "pt",
+    onLanguageChange: (String) -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -42,23 +48,47 @@ fun NutriFlowScaffold(
                     )
                 },
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Notifications, contentDescription = "Notifications")
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Português (PT)") },
+                                onClick = {
+                                    onLanguageChange("pt")
+                                    expanded = false
+                                },
+                                leadingIcon = { Text("🇵🇹") }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("English (EN)") },
+                                onClick = {
+                                    onLanguageChange("en")
+                                    expanded = false
+                                },
+                                leadingIcon = { Text("🇬🇧") }
+                            )
+                        }
                     }
                 }
             )
         },
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-                val items = listOf("Dashboard", "Meal Plan", "Vault", "Profile")
+                val items = listOf("dashboard", "mealplan", "vault", "profile")
+                val labels = listOf(stringResource(R.string.dashboard), stringResource(R.string.meal_plan), stringResource(R.string.vault), stringResource(R.string.profile))
                 val icons = listOf(Icons.Default.Dashboard, Icons.Default.Checklist, Icons.Default.GridView, Icons.Default.Person)
 
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         selected = currentScreen == item,
                         onClick = { onNavigate(item) },
-                        icon = { Icon(icons[index], contentDescription = item) },
-                        label = { Text(item) }
+                        icon = { Icon(icons[index], contentDescription = labels[index]) },
+                        label = { Text(labels[index]) }
                     )
                 }
             }
