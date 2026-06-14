@@ -20,6 +20,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
 import androidx.lifecycle.viewModelScope
 import java.util.UUID
+import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.content
+import android.graphics.Bitmap
+import org.json.JSONObject
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class NutriFlowViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -434,36 +441,52 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
         recalculateStreak()
     }
 
-    // Lógica simples de Streaks (se atingir 85%+ da meta calórica ou completar itens principais)
-    // Recalcular a streak dinamicamente baseada no histórico de refeições
+    // Lógica simples de Streaks (se atingir 85%+ da meta calórica)
+    // Atualiza baseada no dia de hoje e de ontem
     private fun recalculateStreak() {
         val profile = _userProfile.value ?: return
         
+        // Removemos o maxTarget. Se a pessoa comer a mais, continua a ter a streak porque cumpriu o mínimo.
         val minTarget = profile.dailyCalorieGoal * 0.85
-        val maxTarget = profile.dailyCalorieGoal * 1.15
         
-        var currentStreak = 0
-        
-        // Verificar dias anteriores (começa ontem)
-        var daysBack = 1
-        while (true) {
-            val start = getStartOfDayMillis(-daysBack)
-            val end = start + 86400000L
-            val cals = _mealEntries.value.filter { it.timestamp in start until end }.sumOf { it.calories }
-            if (cals.toDouble() in minTarget..maxTarget) {
-                currentStreak++
-                daysBack++
-            } else {
-                break
-            }
-        }
-        
-        // Verificar o dia de hoje
         val startToday = getStartOfDayMillis(0)
         val endToday = startToday + 86400000L
         val calsToday = _mealEntries.value.filter { it.timestamp in startToday until endToday }.sumOf { it.calories }
-        if (calsToday.toDouble() in minTarget..maxTarget) {
-            currentStreak++
+        val completedToday = calsToday >= minTarget
+        
+        val startYesterday = getStartOfDayMillis(-1)
+        val endYesterday = startYesterday + 86400000L
+        val calsYesterday = _mealEntries.value.filter { it.timestamp in startYesterday until endYesterday }.sumOf { it.calories }
+        val completedYesterday = calsYesterday >= minTarget
+
+        val lastStreakDate = sharedPreferences.getLong("lastStreakDate", 0L)
+        var currentStreak = profile.streakCount
+        
+        if (completedToday) {
+            // Se hoje foi concluído
+            if (lastStreakDate < startToday) {
+                // Streak não foi dada hoje
+                if (lastStreakDate == startYesterday || completedYesterday) {
+                    currentStreak += 1
+                } else {
+                    currentStreak = 1
+                }
+                
+                sharedPreferences.edit().putLong("lastStreakDate", startToday).apply()
+                db.collection("profiles").document(profile.id).update(mapOf("lastStreakDate" to startToday))
+            }
+        } else {
+            // Se hoje não foi concluído, verificamos se a streak tinha sido dada hoje e revertemos
+            if (lastStreakDate == startToday) {
+                currentStreak = (currentStreak - 1).coerceAtLeast(0)
+                sharedPreferences.edit().putLong("lastStreakDate", startYesterday).apply()
+                db.collection("profiles").document(profile.id).update(mapOf("lastStreakDate" to startYesterday))
+            }
+            
+            // Se ontem também não cumpriu e o lastStreakDate já é velho, vai a 0
+            if (lastStreakDate < startYesterday && !completedYesterday) {
+                currentStreak = 0
+            }
         }
         
         // Se houver diferença, atualiza
@@ -739,6 +762,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                 val dateOfBirth = doc.getLong("dateOfBirth")
                 val profilePictureUri = doc.getString("profilePictureUri")
                 val lastActiveTimestamp = doc.getLong("lastActiveTimestamp") ?: System.currentTimeMillis()
+                val lastStreakDate = doc.getLong("lastStreakDate") ?: 0L
                 
                 _userProfile.value = UserProfile(
                     id = uid,
@@ -774,6 +798,7 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                     putInt("fatsGoal", fatsGoal)
                     putInt("streak", streakCount)
                     putLong("lastActive", lastActiveTimestamp)
+                    putLong("lastStreakDate", lastStreakDate)
                     apply()
                 }
 
@@ -921,6 +946,80 @@ class NutriFlowViewModel(application: Application) : AndroidViewModel(applicatio
                         "defaultQuantity" to food.defaultQuantity
                     )
                     db.collection("food_database").add(foodData)
+                }
+            }
+        }
+    }
+
+    private val _isAnalyzingFood = MutableStateFlow(false)
+    val isAnalyzingFood: StateFlow<Boolean> = _isAnalyzingFood.asStateFlow()
+
+    private val _analyzedFoodResult = MutableStateFlow<DatabaseFood?>(null)
+    val analyzedFoodResult: StateFlow<DatabaseFood?> = _analyzedFoodResult.asStateFlow()
+
+    private val _analysisError = MutableStateFlow<String?>(null)
+    val analysisError: StateFlow<String?> = _analysisError.asStateFlow()
+
+    fun resetAnalyzedFood() {
+        _analyzedFoodResult.value = null
+    }
+
+    fun clearAnalysisError() {
+        _analysisError.value = null
+    }
+
+    private fun scaleDownBitmap(bitmap: Bitmap, maxDimension: Int): Bitmap {
+        val maxDim = Math.max(bitmap.width, bitmap.height)
+        if (maxDim <= maxDimension) return bitmap
+        val scale = maxDimension.toFloat() / maxDim
+        val newWidth = (bitmap.width * scale).toInt()
+        val newHeight = (bitmap.height * scale).toInt()
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+    }
+
+    fun analyzeFoodImage(bitmap: Bitmap) {
+        _isAnalyzingFood.value = true
+        _analysisError.value = null
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val scaledBitmap = scaleDownBitmap(bitmap, 800)
+                // Initializing the Gemini model
+                val generativeModel = GenerativeModel(
+                    modelName = "gemini-flash-latest",
+                    apiKey = "AIzaSyB_CXgeLU_743wF9TjLAH5MUrWbVETv5eo"
+                )
+
+                val prompt = "Analyze this image and identify the food. Estimate its macronutrients for a typical serving size in grams. Return ONLY a valid JSON object with the following keys exactly: foodName (String), calories (Int), qty (Double), protein (Int), carbs (Int), fats (Int). No markdown formatting, just the raw JSON."
+
+                val response = generativeModel.generateContent(
+                    content {
+                        image(bitmap)
+                        text(prompt)
+                    }
+                )
+
+                val responseText = response.text ?: ""
+                val cleanJsonString = responseText.replace("```json", "").replace("```", "").trim()
+                
+                val jsonObject = JSONObject(cleanJsonString)
+                val food = DatabaseFood(
+                    name = jsonObject.optString("foodName", "Unknown Food"),
+                    calories = jsonObject.optInt("calories", 0),
+                    defaultQuantity = jsonObject.optDouble("qty", 100.0),
+                    protein = jsonObject.optInt("protein", 0),
+                    carbs = jsonObject.optInt("carbs", 0),
+                    fats = jsonObject.optInt("fats", 0)
+                )
+
+                withContext(Dispatchers.Main) {
+                    _analyzedFoodResult.value = food
+                    _isAnalyzingFood.value = false
+                }
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    _analysisError.value = "Erro na análise: ${e.message}"
+                    _isAnalyzingFood.value = false
                 }
             }
         }

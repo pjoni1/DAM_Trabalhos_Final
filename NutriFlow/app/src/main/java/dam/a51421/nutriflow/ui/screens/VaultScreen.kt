@@ -54,11 +54,14 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
 
     val filteredMedia = mediaEntries.filter { it.category == selectedTab }
 
+    val currentLanguage by viewModel.currentLanguage.collectAsState()
+    val locale = remember(currentLanguage) { Locale(currentLanguage) }
+
     // Agrupamento por mês (ex: "Maio 2026")
     val groupedMedia = filteredMedia
         .sortedByDescending { it.date }
         .groupBy { mediaEntry ->
-            val sdf = SimpleDateFormat("MMMM yyyy", Locale("pt"))
+            val sdf = SimpleDateFormat("MMMM yyyy", locale)
             sdf.format(Date(mediaEntry.date)).replaceFirstChar { it.uppercase() }
         }
 
@@ -203,6 +206,7 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
                         items(list) { media ->
                             MediaCard(
                                 media = media,
+                                locale = locale,
                                 onClick = { activeZoomImage = media },
                                 onDelete = { viewModel.removeMediaEntry(media.id) }
                             )
@@ -252,7 +256,7 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
 
                 // Legenda de Data
                 Text(
-                    text = SimpleDateFormat("dd 'de' MMMM 'de' yyyy", Locale("pt")).format(Date(activeZoomImage!!.date)),
+                    text = SimpleDateFormat("dd MMMM yyyy", locale).format(Date(activeZoomImage!!.date)),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
@@ -270,10 +274,11 @@ fun VaultScreen(viewModel: NutriFlowViewModel) {
 @Composable
 fun MediaCard(
     media: MediaEntry,
+    locale: Locale,
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val dateFormat = remember { SimpleDateFormat("dd 'de' MMMM", Locale("pt")) }
+    val dateFormat = remember(locale) { SimpleDateFormat("dd MMMM", locale) }
     val formattedDate = dateFormat.format(Date(media.date))
 
     Card(

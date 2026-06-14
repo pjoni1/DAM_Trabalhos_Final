@@ -23,6 +23,16 @@ import dam.a51421.nutriflow.ui.viewmodel.NutriFlowViewModel
 import androidx.compose.ui.res.stringResource
 import dam.a51421.nutriflow.R
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import java.io.File
+import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
+import android.provider.MediaStore
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogFoodScreen(
@@ -42,6 +52,56 @@ fun LogFoodScreen(
     var searchQuery by remember { mutableStateOf("") }
     val searchResults by viewModel.foodSearchResults.collectAsState()
     
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
+    
+    val isAnalyzing by viewModel.isAnalyzingFood.collectAsState()
+    val analyzedFood by viewModel.analyzedFoodResult.collectAsState()
+    val analysisError by viewModel.analysisError.collectAsState()
+    
+    LaunchedEffect(analyzedFood) {
+        analyzedFood?.let { food ->
+            foodName = food.name
+            calories = food.calories.toString()
+            quantity = food.defaultQuantity.toInt().toString()
+            protein = food.protein.toString()
+            carbs = food.carbs.toString()
+            fats = food.fats.toString()
+            viewModel.resetAnalyzedFood()
+        }
+    }
+
+    LaunchedEffect(analysisError) {
+        analysisError?.let {
+            errorMessage = it
+            viewModel.clearAnalysisError()
+        }
+    }
+    
+    fun processImageUri(uri: Uri) {
+        try {
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            }
+            viewModel.analyzeFoodImage(bitmap)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { processImageUri(it) }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            tempCameraUri?.let { processImageUri(it) }
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.seedFoodDatabase()
     }
@@ -133,7 +193,7 @@ fun LogFoodScreen(
             // Botão de Pesquisa com Câmara
             item {
                 Button(
-                    onClick = { /* Implementação futura com API de Visão */ },
+                    onClick = { showBottomSheet = true },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -276,6 +336,65 @@ fun LogFoodScreen(
             }
 
             item { Spacer(Modifier.height(80.dp)) }
+        }
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = rememberModalBottomSheetState()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.search_camera), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(16.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            val imageFile = File(context.cacheDir, "camera_images/temp_${System.currentTimeMillis()}.jpg")
+                            imageFile.parentFile?.mkdirs()
+                            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", imageFile)
+                            tempCameraUri = uri
+                            showBottomSheet = false
+                            cameraLauncher.launch(uri)
+                        }.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.CameraAlt, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.width(16.dp))
+                        Text("Tirar Fotografia", style = MaterialTheme.typography.bodyLarge)
+                    }
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            showBottomSheet = false
+                            galleryLauncher.launch("image/*")
+                        }.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.PhotoLibrary, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.width(16.dp))
+                        Text("Escolher da Galeria", style = MaterialTheme.typography.bodyLarge)
+                    }
+                    Spacer(Modifier.height(32.dp))
+                }
+            }
+        }
+
+        if (isAnalyzing) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable(enabled = false) {},
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator()
+                        Spacer(Modifier.height(16.dp))
+                        Text("A analisar imagem...", fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
     }
 }

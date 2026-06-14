@@ -29,11 +29,13 @@ fun MealPlanScreen(viewModel: NutriFlowViewModel) {
     val mealPlan by viewModel.currentMealPlan.collectAsState()
     val entries by viewModel.filteredMealEntries.collectAsState()
     val offset by viewModel.selectedDateOffset.collectAsState()
+    val lang by viewModel.currentLanguage.collectAsState()
 
-    val displayDate = remember(offset) {
+    val displayDate = remember(offset, lang) {
         val cal = Calendar.getInstance()
         cal.add(Calendar.DAY_OF_YEAR, offset)
-        SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault()).format(cal.time)
+        val locale = Locale(lang)
+        SimpleDateFormat("dd MMMM, yyyy", locale).format(cal.time)
     }
 
     val label = when (offset) {
@@ -98,21 +100,24 @@ fun MealPlanScreen(viewModel: NutriFlowViewModel) {
             // Agrupar por hora ou tipo de refeição
             val breakfast = targetFoods.filter { it.time == "08:00 AM" }
             val lunch = targetFoods.filter { it.time == "12:30 PM" }
+            val snack = targetFoods.filter { it.time == "04:00 PM" }
             val dinner = targetFoods.filter { it.time == "08:00 PM" }
 
-            if (breakfast.isNotEmpty()) {
-                item {
-                    MealSection("Pequeno-Almoço", "08:00 AM", breakfast, entries, viewModel, offset)
+            item {
+                if (breakfast.isNotEmpty()) {
+                    MealSection(stringResource(R.string.breakfast), "08:00 AM", breakfast, entries, viewModel, offset)
+                    Spacer(Modifier.height(16.dp))
                 }
-            }
-            if (lunch.isNotEmpty()) {
-                item {
-                    MealSection("Almoço", "12:30 PM", lunch, entries, viewModel, offset)
+                if (lunch.isNotEmpty()) {
+                    MealSection(stringResource(R.string.lunch), "12:30 PM", lunch, entries, viewModel, offset)
+                    Spacer(Modifier.height(16.dp))
                 }
-            }
-            if (dinner.isNotEmpty()) {
-                item {
-                    MealSection("Jantar", "08:00 PM", dinner, entries, viewModel, offset)
+                if (snack.isNotEmpty()) {
+                    MealSection(stringResource(R.string.snack), "04:00 PM", snack, entries, viewModel, offset)
+                    Spacer(Modifier.height(16.dp))
+                }
+                if (dinner.isNotEmpty()) {
+                    MealSection(stringResource(R.string.dinner), "08:00 PM", dinner, entries, viewModel, offset)
                 }
             }
         }

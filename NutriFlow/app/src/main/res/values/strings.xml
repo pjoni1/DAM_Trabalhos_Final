@@ -121,4 +121,17 @@
     <string name="empty_meal">No meal photos yet</string>
     <string name="empty_evolution_subtitle">Take regular photos to see your transformation organized month by month.</string>
     <string name="empty_meal_subtitle">Create a healthy visual portfolio of the meals you consume.</string>
+    <string name="keep_smashing">Keep smashing your goals. Stay focused!</string>
+    <string name="log_meal_streak">Log your meal plan to start your daily streak.</string>
+    <string name="macronutrients">Macronutrients</string>
+    <string name="proteins">Proteins</string>
+    <string name="carbs_short">Carbs</string>
+    <string name="fats_short">Fats</string>
+    <string name="breakfast">Breakfast</string>
+    <string name="lunch">Lunch</string>
+    <string name="dinner">Dinner</string>
+    <string name="snack">Snack</string>
+    <string name="select_language">Select Language</string>
+    <string name="english">English</string>
+    <string name="portuguese">Portuguese</string>
 </resources>

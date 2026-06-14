@@ -33,11 +33,13 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
     val profile by viewModel.userProfile.collectAsState()
     val entries by viewModel.filteredMealEntries.collectAsState()
     val offset by viewModel.selectedDateOffset.collectAsState()
+    val currentLanguage by viewModel.currentLanguage.collectAsState()
 
-    val displayDate = remember(offset) {
+    val displayDate = remember(offset, currentLanguage) {
         val cal = Calendar.getInstance()
         cal.add(Calendar.DAY_OF_YEAR, offset)
-        SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault()).format(cal.time)
+        val locale = Locale(currentLanguage)
+        SimpleDateFormat("dd MMMM, yyyy", locale).format(cal.time)
     }
 
     val label = when (offset) {
@@ -147,8 +149,8 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = if (streak > 0) "Keep smashing your goals. Stay focused!" 
-                                   else "Log your meal plan to start your daily streak.", 
+                            text = if (streak > 0) stringResource(R.string.keep_smashing) 
+                                   else stringResource(R.string.log_meal_streak), 
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )
@@ -215,16 +217,16 @@ fun DashboardScreen(viewModel: NutriFlowViewModel) {
 
         // Macronutrientes
         item {
-            Text(stringResource(R.string.macronutrients_optional).replace(" (Opcional)", "").replace(" (Optional)", ""), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.macronutrients), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(4.dp))
             
             val proteinProgress = if (proteinGoal > 0) (totalProteinConsumed.toFloat() / proteinGoal).coerceIn(0f, 1f) else 0f
             val carbsProgress = if (carbsGoal > 0) (totalCarbsConsumed.toFloat() / carbsGoal).coerceIn(0f, 1f) else 0f
             val fatsProgress = if (fatsGoal > 0) (totalFatsConsumed.toFloat() / fatsGoal).coerceIn(0f, 1f) else 0f
 
-            MacroCard("Proteínas", "${totalProteinConsumed}g / ${proteinGoal}g", proteinProgress, MaterialTheme.colorScheme.primary)
-            MacroCard("Hidratos de Carb.", "${totalCarbsConsumed}g / ${carbsGoal}g", carbsProgress, Color(0xFF0288D1))
-            MacroCard("Gorduras", "${totalFatsConsumed}g / ${fatsGoal}g", fatsProgress, Color(0xFFFFA726))
+            MacroCard(stringResource(R.string.proteins), "${totalProteinConsumed}g / ${proteinGoal}g", proteinProgress, MaterialTheme.colorScheme.primary)
+            MacroCard(stringResource(R.string.carbs_short), "${totalCarbsConsumed}g / ${carbsGoal}g", carbsProgress, Color(0xFF0288D1))
+            MacroCard(stringResource(R.string.fats_short), "${totalFatsConsumed}g / ${fatsGoal}g", fatsProgress, Color(0xFFFFA726))
         }
 
         // Registo de Refeições de Hoje

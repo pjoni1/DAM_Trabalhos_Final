@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
+    implementation(libs.generativeai)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
 }
